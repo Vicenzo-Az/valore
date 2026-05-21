@@ -7,6 +7,7 @@ import { TrendsCard } from "@/components/dashboard/TrendsCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTransactions } from "@/context";
+import { getAccounts } from "@/services/accountService";
 import {
   getByCategory,
   getMonthly,
@@ -14,12 +15,12 @@ import {
   getTrends,
 } from "@/services/analyticsService";
 import type {
-  AnalyticsSummary,
+  Account, AnalyticsSummary,
   CategoryData,
   MonthlyData,
-  TrendsData,
+  TrendsData
 } from "@/types";
-import { Loader2, PlusCircle } from "lucide-react";
+import { Loader2, PlusCircle, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -32,6 +33,13 @@ export default function Dashboard() {
   const [byCategory, setByCategory] = useState<CategoryData[]>([]);
   const [trends, setTrends] = useState<TrendsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+
+  useEffect(() => {
+    getAccounts()
+      .then(setAccounts)
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -60,6 +68,7 @@ export default function Dashboard() {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 
+  const hasNoAccounts = accounts.length === 0;
   const isEmpty =
     transactions.filter((t) => t.type !== "transfer").length === 0;
 
@@ -103,6 +112,29 @@ export default function Dashboard() {
           />
         </div>
       </div>
+
+      {/* Banner onboarding — aparece quando não há contas */}
+      {hasNoAccounts && (
+        <Card className="border-amber-500/30 bg-amber-500/5 p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Wallet size={20} className="text-amber-500 shrink-0" />
+              <p className="text-sm">
+                <span className="font-medium">Crie uma conta financeira</span>{" "}
+                para vincular transações e ver seu patrimônio real.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => navigate("/accounts")}
+              className="shrink-0 border-amber-500/40 text-amber-600 hover:bg-amber-500/10"
+            >
+              Criar conta
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {isEmpty ? (
         <Card className="p-12 text-center border-2 border-dashed">
