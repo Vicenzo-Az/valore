@@ -3,16 +3,12 @@
  */
 
 export type {
-    CreateTransactionInput,
-    Transaction,
-    TransactionType,
-    UpdateTransactionInput
+    CreateTransactionInput, Transaction,
+    TransactionType, TransferInput, UpdateTransactionInput
 } from "./transaction";
 
 export type {
-    ApiError,
-    Summary,
-    UploadResponse,
+    Account, AnalyticsSummary, ApiError, Category, CategoryData, CategoryType, CreateAccountInput, CreateCategoryInput, MonthlyData, Summary, TrendsData, UpdateAccountInput, UpdateCategoryInput, UploadResponse,
     UserResponse
 } from "./finance";
 

@@ -1,21 +1,4 @@
-// ─── Transação ────────────────────────────────────────────────────────────────
-
-export type TransactionType = "income" | "expense";
-
-export interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  type: TransactionType;
-  category: string;
-  date: string; // ISO 8601: "2025-01-02"
-}
-
-export type CreateTransactionInput = Omit<Transaction, "id">;
-
-export type UpdateTransactionInput = Partial<Omit<Transaction, "id">>;
-
-// ─── Resumo financeiro (resposta do /upload) ──────────────────────────────────
+// ─── Resumo financeiro ────────────────────────────────────────────────────────
 
 export interface Summary {
   income: number;
@@ -39,4 +22,77 @@ export interface UserResponse {
   id: string;
   email: string;
   name: string;
+}
+
+// ─── Categoria ────────────────────────────────────────────────────────────────
+
+export type CategoryType = "income" | "expense" | "both";
+
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  type: CategoryType;
+  user_id: string | null;
+  parent_id: string | null;
+}
+
+export type CreateCategoryInput = Omit<
+  Category,
+  "id" | "user_id" | "parent_id"
+>;
+export type UpdateCategoryInput = Partial<CreateCategoryInput>;
+
+// ─── Conta financeira ─────────────────────────────────────────────────────────
+
+export interface Account {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  initial_balance: number;
+  user_id: string;
+  current_balance: number;
+}
+
+export type CreateAccountInput = Omit<
+  Account,
+  "id" | "user_id" | "current_balance"
+>;
+export type UpdateAccountInput = Partial<CreateAccountInput>;
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+export interface AnalyticsSummary {
+  income: number;
+  expense: number;
+  balance: number;
+  net_worth: number;
+  transaction_count: number;
+}
+
+export interface MonthlyData {
+  month: string;
+  income: number;
+  expense: number;
+  balance: number;
+}
+
+export interface CategoryData {
+  category_id: string;
+  category_name: string;
+  category_color: string;
+  category_icon: string;
+  total: number;
+}
+
+export interface TrendsData {
+  current_month: { income: number; expense: number; balance: number };
+  previous_month: { income: number; expense: number; balance: number };
+  variation: {
+    income: number | null;
+    expense: number | null;
+    balance: number | null;
+  };
 }

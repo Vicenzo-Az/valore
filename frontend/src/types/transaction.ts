@@ -1,26 +1,33 @@
-/**
- * Tipo de transação financeira
- */
-export type TransactionType = "income" | "expense";
+export type TransactionType = "income" | "expense" | "transfer";
 
-/**
- * Interface que representa uma transação financeira
- */
 export interface Transaction {
   id: string;
   description: string;
   amount: number;
   type: TransactionType;
-  category: string;
   date: string;
+  user_id: string;
+  category_id: string | null;
+  account_id: string | null;
+  transfer_id: string | null;
+  transfer_direction: "in" | "out" | null;
 }
 
-/**
- * Tipo para criar uma nova transação (sem o ID)
- */
-export type CreateTransactionInput = Omit<Transaction, "id">;
+export type CreateTransactionInput = {
+  description: string;
+  amount: number;
+  type: TransactionType;
+  date: string;
+  category_id?: string | null;
+  account_id?: string | null;
+};
 
-/**
- * Tipo para atualizar uma transação existente (campos opcionais)
- */
-export type UpdateTransactionInput = Partial<Omit<Transaction, "id">>;
+export type UpdateTransactionInput = Partial<CreateTransactionInput>;
+
+export interface TransferInput {
+  from_account_id: string;
+  to_account_id: string;
+  amount: number;
+  date: string;
+  description?: string;
+}
