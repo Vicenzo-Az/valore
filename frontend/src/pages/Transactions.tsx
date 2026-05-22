@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Calendar } from "lucide-react";
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString + "T00:00:00");
@@ -71,6 +71,8 @@ export default function Transactions() {
   const [filterType, setFilterType] = useState<string>("all");
   const [filterAccount, setFilterAccount] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterDateFrom, setFilterDateFrom] = useState<string>("");
+  const [filterDateTo, setFilterDateTo] = useState<string>("");
 
   // Formulário add
   const [description, setDescription] = useState("");
@@ -123,6 +125,8 @@ export default function Transactions() {
       .catch(() => {});
   }, []);
 
+  // CORRETO — três blocos separados no nível do componente:
+
   const filteredTransactions = useMemo(() => {
     return [...transactions]
       .filter((t) => filterType === "all" || t.type === filterType)
@@ -130,8 +134,34 @@ export default function Transactions() {
       .filter(
         (t) => filterCategory === "all" || t.category_id === filterCategory,
       )
+      .filter((t) => !filterDateFrom || t.date >= filterDateFrom)
+      .filter((t) => !filterDateTo || t.date <= filterDateTo)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [transactions, filterType, filterAccount, filterCategory]);
+  }, [
+    transactions,
+    filterType,
+    filterAccount,
+    filterCategory,
+    filterDateFrom,
+    filterDateTo,
+  ]);
+
+  const groupedByMonth = useMemo(() => {
+    const groups: Record<string, Transaction[]> = {};
+    for (const t of filteredTransactions) {
+      const [year, month] = t.date.split("-");
+      const key = `${year}-${month}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(t);
+    }
+    return Object.entries(groups).sort(([a], [b]) => b.localeCompare(a));
+  }, [filteredTransactions]);
+
+  function formatMonthHeader(key: string): string {
+    const [year, month] = key.split("-");
+    const date = new Date(Number(year), Number(month) - 1);
+    return date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  }
 
   function validate(desc: string, amt: string, dt: string) {
     const e = { description: "", amount: "", date: "" };
@@ -451,6 +481,28 @@ export default function Transactions() {
             ))}
           </SelectContent>
         </Select>
+        <div className="flex items-center gap-2 border border-border rounded-md px-3 h-10">
+          <Calendar size={14} className="text-muted-foreground shrink-0" />
+          <input
+            type="date"
+            value={filterDateFrom}
+            onChange={(e) => setFilterDateFrom(e.target.value)}
+            max={todayISO}
+            className="text-sm bg-transparent outline-none w-32"
+            placeholder="De"
+          />
+        </div>
+        <div className="flex items-center gap-2 border border-border rounded-md px-3 h-10">
+          <Calendar size={14} className="text-muted-foreground shrink-0" />
+          <input
+            type="date"
+            value={filterDateTo}
+            onChange={(e) => setFilterDateTo(e.target.value)}
+            max={todayISO}
+            className="text-sm bg-transparent outline-none w-32"
+            placeholder="Até"
+          />
+        </div>
       </div>
 
       {/* Dialog edição */}
@@ -549,72 +601,86 @@ export default function Transactions() {
       </Dialog>
 
       {/* Tabela */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Data</TableHead>
-              <TableHead>Descrição</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Conta</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
-              <TableHead className="text-center">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTransactions.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-center text-muted-foreground py-8"
-                >
-                  Nenhuma transação encontrada
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredTransactions.map((t) => (
-                <TableRow key={t.id}>
-                  <TableCell>{formatDate(t.date)}</TableCell>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      {t.type === "transfer" && (
-                        <ArrowLeftRight
-                          size={14}
-                          className="text-blue-400 shrink-0"
-                        />
-                      )}
-                      {t.description}
-                    </div>
-                  </TableCell>
-                  <TableCell>{getCategoryName(t.category_id)}</TableCell>
-                  <TableCell>{getAccountName(t.account_id)}</TableCell>
-                  <TableCell className={amountClass(t)}>
-                    {formatAmount(t)}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {t.type !== "transfer" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditClick(t)}
-                      >
-                        Editar
-                      </Button>
-                    )}
-                    <span className="mx-1" />
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => removeTransaction(t.id)}
-                    >
-                      {t.type === "transfer" ? "Cancelar" : "Deletar"}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      {/* Tabela agrupada por mês */}
+      <div className="space-y-6">
+        {filteredTransactions.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
+            Nenhuma transação encontrada
+          </div>
+        ) : (
+          groupedByMonth.map(([monthKey, monthTransactions]) => (
+            <div
+              key={monthKey}
+              className="rounded-xl border border-border bg-card overflow-hidden"
+            >
+              {/* Cabeçalho do mês */}
+              <div className="px-6 py-3 bg-muted/40 border-b border-border flex items-center justify-between">
+                <span className="text-sm font-semibold capitalize">
+                  {formatMonthHeader(monthKey)}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {monthTransactions.length} transação
+                  {monthTransactions.length !== 1 ? "s" : ""}
+                </span>
+              </div>
+
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead>Categoria</TableHead>
+                    <TableHead>Conta</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
+                    <TableHead className="text-center">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {monthTransactions.map((t) => (
+                    <TableRow key={t.id}>
+                      <TableCell>{formatDate(t.date)}</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {t.type === "transfer" && (
+                            <ArrowLeftRight
+                              size={14}
+                              className="text-blue-400 shrink-0"
+                            />
+                          )}
+                          {t.description}
+                        </div>
+                      </TableCell>
+                      <TableCell>{getCategoryName(t.category_id)}</TableCell>
+                      <TableCell>{getAccountName(t.account_id)}</TableCell>
+                      <TableCell className={amountClass(t)}>
+                        {formatAmount(t)}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {t.type !== "transfer" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditClick(t)}
+                          >
+                            Editar
+                          </Button>
+                        )}
+                        <span className="mx-1" />
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => removeTransaction(t.id)}
+                        >
+                          {t.type === "transfer" ? "Cancelar" : "Deletar"}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
