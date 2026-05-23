@@ -12,6 +12,7 @@ class TransactionBase(BaseModel):
     date: str
     category_id: str | None = None
     account_id: str | None = None
+    is_recurring: bool = False
 
 
 class CreateTransactionInput(TransactionBase):
@@ -25,6 +26,7 @@ class UpdateTransactionInput(BaseModel):
     date: str | None = None
     category_id: str | None = None
     account_id: str | None = None
+    is_recurring: bool | None = None
 
 
 class TransferInput(BaseModel):

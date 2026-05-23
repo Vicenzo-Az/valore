@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, ForeignKey, String
+from sqlalchemy import Boolean, Column, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, relationship
 
 from src.core.database import Base
@@ -22,6 +22,7 @@ class Transaction(Base):
     transfer_id: Mapped[str | None] = Column(String, nullable=True)
     transfer_direction: Mapped[str | None] = Column(
         String, nullable=True)  # "out" | "in"
+    is_recurring: Mapped[bool] = Column(Boolean, nullable=False, default=False)
 
     user = relationship("User", back_populates="transactions")
     category = relationship("Category", back_populates="transactions")

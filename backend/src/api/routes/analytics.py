@@ -218,3 +218,129 @@ def get_trends(
             "balance": variation(current["balance"], previous["balance"]),
         },
     }
+
+
+@router.get("/recurring-average")
+def get_recurring_average(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Média mensal das despesas recorrentes por categoria."""
+    transactions = (
+        db.query(TransactionModel)
+        .filter(
+            TransactionModel.user_id == current_user.id,
+            TransactionModel.type == "expense",
+            TransactionModel.is_recurring == True,  # noqa: E712
+        )
+        .all()
+    )
+    df = _transactions_to_df(transactions)
+
+    if df.empty:
+        return {"average_monthly": 0.0, "by_category": [], "total_recurring": 0.0}
+
+    # Adiciona coluna de mês
+    df["month"] = df["date"].dt.to_period("M").astype(str)
+
+    # Total de meses distintos com despesas recorrentes
+    n_months = df["month"].nunique()
+
+    # Média mensal global
+    total = float(df["amount"].sum())
+    average_monthly = round(total / n_months, 2) if n_months > 0 else 0.0
+
+    # Por categoria
+    category_ids = df["category_id"].dropna().unique().tolist()
+    categories = (
+        db.query(CategoryModel)
+        .filter(CategoryModel.id.in_(category_ids))
+        .all()
+    ) if category_ids else []
+    cat_map = {
+        c.id: {"name": c.name, "color": c.color, "icon": c.icon}
+        for c in categories
+    }
+
+    by_cat = df.groupby("category_id")["amount"].sum().reset_index()
+    by_category = []
+    for _, row in by_cat.iterrows():
+        cat_id = row["category_id"]
+        cat_info = cat_map.get(
+            cat_id, {"name": "Sem categoria",
+                     "color": "#94a3b8", "icon": "tag"}
+        )
+        total_cat = float(row["amount"])
+        by_category.append({
+            "category_id": cat_id,
+            "category_name": cat_info["name"],
+            "category_color": cat_info["color"],
+            "category_icon": cat_info["icon"],
+            "total": round(total_cat, 2),
+            "monthly_average": round(total_cat / n_months, 2),
+        })
+
+    return {
+        "average_monthly": average_monthly,
+        "total_recurring": round(total, 2),
+        "n_months": n_months,
+        "by_category": sorted(by_category, key=lambda x: x["total"], reverse=True),
+    }
+
+
+@router.get("/compare-months")
+def compare_months(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    month_a: str = Query(description="Mês A no formato YYYY-MM"),
+    month_b: str = Query(description="Mês B no formato YYYY-MM"),
+):
+    """Compara receitas e despesas entre dois meses específicos."""
+    transactions = (
+        db.query(TransactionModel)
+        .filter(
+            TransactionModel.user_id == current_user.id,
+            TransactionModel.type != "transfer",
+        )
+        .all()
+    )
+    df = _transactions_to_df(transactions)
+
+    if df.empty:
+        return {"month_a": {}, "month_b": {}}
+
+    df["month"] = df["date"].dt.to_period("M").astype(str)
+
+    def summarize_month(month: str) -> dict:
+        frame = df[df["month"] == month]
+        if frame.empty:
+            return {"month": month, "income": 0.0, "expense": 0.0, "balance": 0.0, "transaction_count": 0}
+        income = round(
+            float(frame[frame["type"] == "income"]["amount"].sum()), 2)
+        expense = round(
+            float(frame[frame["type"] == "expense"]["amount"].sum()), 2)
+        return {
+            "month": month,
+            "income": income,
+            "expense": expense,
+            "balance": round(income - expense, 2),
+            "transaction_count": len(frame),
+        }
+
+    def variation(a: float, b: float) -> float | None:
+        if b == 0:
+            return None
+        return round(((a - b) / b) * 100, 1)
+
+    summary_a = summarize_month(month_a)
+    summary_b = summarize_month(month_b)
+
+    return {
+        "month_a": summary_a,
+        "month_b": summary_b,
+        "variation": {
+            "income": variation(summary_a["income"], summary_b["income"]),
+            "expense": variation(summary_a["expense"], summary_b["expense"]),
+            "balance": variation(summary_a["balance"], summary_b["balance"]),
+        },
+    }
