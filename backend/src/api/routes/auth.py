@@ -7,7 +7,7 @@ from src.core.database import get_db
 from src.core.dependencies import get_current_user
 from src.core.security import hash_password, verify_password, create_access_token
 from src.models.user import User
-from src.schemas.user import RegisterInput, LoginInput, UserResponse
+from src.schemas.user import RegisterInput, LoginInput, UserResponse, UpdateUserInput
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -73,4 +73,36 @@ def logout(response: Response):
 
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
+@router.put("/me", response_model=UserResponse)
+def update_me(
+    input: UpdateUserInput,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if input.name:
+        current_user.name = input.name
+
+    if input.email:
+        existing = db.query(User).filter(
+            User.email == input.email,
+            User.id != current_user.id,
+        ).first()
+        if existing:
+            raise HTTPException(status_code=409, detail="E-mail já cadastrado")
+        current_user.email = input.email
+
+    if input.new_password:
+        if not input.current_password:
+            raise HTTPException(
+                status_code=400, detail="Senha atual obrigatória")
+        if not verify_password(input.current_password, current_user.hashed_password):
+            raise HTTPException(
+                status_code=400, detail="Senha atual incorreta")
+        current_user.hashed_password = hash_password(input.new_password)
+
+    db.commit()
+    db.refresh(current_user)
     return current_user
