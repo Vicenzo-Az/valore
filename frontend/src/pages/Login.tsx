@@ -76,7 +76,7 @@ export default function Login({ onLogin }: Props) {
             onClick={() => navigate("/")}
             className="text-emerald-300 font-semibold text-lg tracking-tight hover:text-emerald-200 transition-colors"
           >
-            Finance Tracker
+            Valore
           </button>
           <p className="text-white/40 text-sm mt-1">Bem-vindo de volta</p>
         </motion.div>

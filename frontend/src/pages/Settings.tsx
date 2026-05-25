@@ -24,7 +24,7 @@ export default function Settings() {
           <div>
             <h2 className="font-semibold mb-1">Aparência</h2>
             <p className="text-sm text-muted-foreground">
-              Escolha como o Finance Tracker aparece para você.
+              Escolha como o Valore aparece para você.
             </p>
           </div>
 
