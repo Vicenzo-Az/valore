@@ -76,8 +76,8 @@ export default function Settings() {
         <CardContent className="p-6 space-y-2">
           <h2 className="font-semibold mb-1">Sobre</h2>
           <div className="space-y-1 text-sm text-muted-foreground">
-            <p>Finance Tracker v1.0</p>
-            <p>Desenvolvido como Trabalho de Conclusão de Curso</p>
+            <p>Valore v1.0</p>
+            <p>Domine suas finanças</p>
             <p>CSTSI — IFSul · 2026</p>
           </div>
         </CardContent>

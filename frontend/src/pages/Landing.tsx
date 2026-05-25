@@ -1,11 +1,11 @@
 import { motion, useInView, type Variants } from "framer-motion";
 import {
-    ArrowRight,
-    BarChart2,
-    Lock,
-    RefreshCw,
-    Shield,
-    Zap,
+  ArrowRight,
+  BarChart2,
+  Lock,
+  RefreshCw,
+  Shield,
+  Zap,
 } from "lucide-react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -123,7 +123,7 @@ export default function Landing() {
         className="relative z-10 flex items-center justify-between px-8 py-5 max-w-6xl mx-auto"
       >
         <span className="text-lg font-semibold tracking-tight text-emerald-300">
-          Finance Tracker
+          Valore
         </span>
         <div className="flex items-center gap-3">
           <button
@@ -160,7 +160,7 @@ export default function Landing() {
           "
         >
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          Gestão financeira pessoal
+          Domine suas finanças
         </motion.div>
 
         <motion.h1
@@ -387,7 +387,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/8 py-8 text-center">
         <p className="text-xs text-white/25">
-          © 2025 Finance Tracker · Desenvolvido como TCC — CSTSI / IFSul
+          © 2026 Valore · Desenvolvido como TCC — CSTSI / IFSul
         </p>
       </footer>
     </div>
