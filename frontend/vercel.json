@@ -5,7 +5,7 @@
       "destination": "https://valore-api-279d7c3cc379.herokuapp.com/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ],
