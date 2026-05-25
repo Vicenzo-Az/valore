@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from uuid import uuid4
@@ -13,13 +15,13 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _set_auth_cookie(response: Response, token: str) -> None:
-    """Seta o cookie httpOnly com o JWT."""
+    is_production = os.getenv("ENVIRONMENT") == "production"
     response.set_cookie(
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,       # True em produção (HTTPS)
-        samesite="lax",
+        secure=is_production,        # True em produção (HTTPS)
+        samesite="none" if is_production else "lax",
         max_age=settings.access_token_expire_minutes * 60,
     )
 
