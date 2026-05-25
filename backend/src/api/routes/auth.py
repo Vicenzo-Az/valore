@@ -69,7 +69,13 @@ def login(input: LoginInput, response: Response, db: Session = Depends(get_db)):
 
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie(key="access_token")
+    is_production = os.getenv("ENVIRONMENT") == "production"
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=is_production,
+        samesite="none" if is_production else "lax",
+    )
     return {"message": "Logout realizado com sucesso"}
 
 
