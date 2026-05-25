@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/:path+/",
+      "destination": "https://valore-api-279d7c3cc379.herokuapp.com/:path+/"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://valore-api-279d7c3cc379.herokuapp.com/:path*"
     },
