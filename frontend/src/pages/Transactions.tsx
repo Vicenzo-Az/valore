@@ -66,6 +66,7 @@ export default function Transactions() {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const todayISO = useMemo(() => new Date().toISOString().split("T")[0], []);
 
   // Filtros
   const [filterType, setFilterType] = useState<string>("all");
@@ -80,7 +81,7 @@ export default function Transactions() {
   const [type, setType] = useState<"income" | "expense">("expense");
   const [categoryId, setCategoryId] = useState<string>("");
   const [accountId, setAccountId] = useState<string>("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(todayISO);
   const [isRecurring, setIsRecurring] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [errors, setErrors] = useState({
@@ -115,8 +116,6 @@ export default function Transactions() {
     "Transferência entre contas",
   );
   const [transferError, setTransferError] = useState("");
-
-  const todayISO = useMemo(() => new Date().toISOString().split("T")[0], []);
 
   useEffect(() => {
     getCategories()
