@@ -22,6 +22,7 @@ export type CreateTransactionInput = {
   category_id?: string | null;
   account_id?: string | null;
   is_recurring?: boolean;
+  installments?: number;
 };
 
 export type UpdateTransactionInput = Partial<CreateTransactionInput>;

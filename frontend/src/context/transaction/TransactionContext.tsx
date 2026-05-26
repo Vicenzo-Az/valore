@@ -50,7 +50,8 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
     try {
       setError(null);
       const created = await apiCreate(input);
-      setTransactions((prev) => [created, ...prev]);
+      // createTransaction agora retorna array (simples ou parcelado)
+      setTransactions((prev) => [...created, ...prev]);
     } catch {
       setError("Erro ao adicionar transação.");
     }

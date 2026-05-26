@@ -24,8 +24,8 @@ export async function getTransaction(id: string): Promise<Transaction> {
 
 export async function createTransaction(
   input: CreateTransactionInput,
-): Promise<Transaction> {
-  const { data } = await api.post<Transaction>("/transactions/", input);
+): Promise<Transaction[]> {
+  const { data } = await api.post<Transaction[]>("/transactions/", input);
   return data;
 }
 

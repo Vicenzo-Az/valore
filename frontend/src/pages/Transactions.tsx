@@ -81,6 +81,7 @@ export default function Transactions() {
   const [type, setType] = useState<"income" | "expense">("expense");
   const [categoryId, setCategoryId] = useState<string>("");
   const [accountId, setAccountId] = useState<string>("");
+  const [installments, setInstallments] = useState(1);
   const [date, setDate] = useState(todayISO);
   const [isRecurring, setIsRecurring] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
@@ -147,6 +148,9 @@ export default function Transactions() {
     filterDateTo,
   ]);
 
+  const selectedAccount = accounts.find((a) => a.id === accountId);
+  const isSelectedAccountCredit = selectedAccount?.is_credit ?? false;
+
   const groupedByMonth = useMemo(() => {
     const groups: Record<string, Transaction[]> = {};
     for (const t of filteredTransactions) {
@@ -187,11 +191,13 @@ export default function Transactions() {
       category_id: categoryId || null,
       account_id: accountId || null,
       is_recurring: isRecurring,
+      installments,
     });
     setDescription("");
     setAmount("");
     setCategoryId("");
     setAccountId("");
+    setInstallments(1);
     setDate("");
     setAddOpen(false);
     setIsRecurring(false);
@@ -410,7 +416,13 @@ export default function Transactions() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={accountId} onValueChange={setAccountId}>
+                <Select
+                  value={accountId}
+                  onValueChange={(v) => {
+                    setAccountId(v);
+                    setInstallments(1);
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Conta (opcional)" />
                   </SelectTrigger>
@@ -422,6 +434,38 @@ export default function Transactions() {
                     ))}
                   </SelectContent>
                 </Select>
+                {isSelectedAccountCredit && (
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1.5 block font-medium">
+                      Número de parcelas
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setInstallments(Math.max(1, installments - 1))
+                        }
+                        className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                      >
+                        -
+                      </button>
+                      <span className="flex-1 text-center font-semibold">
+                        {installments === 1
+                          ? "À vista"
+                          : `${installments}x de R$ ${(Number(amount) / installments).toFixed(2)}`}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setInstallments(Math.min(48, installments + 1))
+                        }
+                        className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <div>
                   <Input
                     type="date"

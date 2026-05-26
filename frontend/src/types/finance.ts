@@ -53,6 +53,7 @@ export interface Account {
   icon: string;
   color: string;
   initial_balance: number;
+  is_credit: boolean;
   user_id: string;
   current_balance: number;
 }

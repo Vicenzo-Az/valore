@@ -1,18 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-    createAccount,
-    deleteAccount,
-    getAccounts,
-    updateAccount,
+  createAccount,
+  deleteAccount,
+  getAccounts,
+  updateAccount,
 } from "@/services/accountService";
 import type { Account, CreateAccountInput } from "@/types";
 import { Loader2, Pencil, Plus, Trash2, Wallet } from "lucide-react";
@@ -57,9 +57,20 @@ function AccountCard({
             </div>
             <div>
               <p className="font-semibold">{account.name}</p>
-              <p className="text-xs text-muted-foreground">
-                Saldo inicial: R$ {account.initial_balance.toFixed(2)}
-              </p>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                    account.is_credit
+                      ? "bg-blue-500/10 text-blue-500"
+                      : "bg-emerald-500/10 text-emerald-500"
+                  }`}
+                >
+                  {account.is_credit ? "Crédito" : "Débito"}
+                </span>
+                <p className="text-xs text-muted-foreground">
+                  Inicial: R$ {account.initial_balance.toFixed(2)}
+                </p>
+              </div>
             </div>
           </div>
           <div className="flex gap-1">
@@ -110,6 +121,7 @@ function AccountForm({
     initial?.initial_balance?.toString() ?? "0",
   );
   const [color, setColor] = useState(initial?.color ?? "#10b981");
+  const [isCredit, setIsCredit] = useState(initial?.is_credit ?? false);
   const [error, setError] = useState("");
 
   function handleSave() {
@@ -126,6 +138,7 @@ function AccountForm({
       initial_balance: Number(initialBalance),
       color,
       icon: "wallet",
+      is_credit: isCredit,
     });
   }
 
@@ -172,6 +185,35 @@ function AccountForm({
               style={{ backgroundColor: c }}
             />
           ))}
+        </div>
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground mb-1.5 block font-medium">
+          Tipo de conta
+        </label>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsCredit(false)}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-all ${
+              !isCredit
+                ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : "border-border text-muted-foreground hover:border-emerald-500/40"
+            }`}
+          >
+            Débito
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsCredit(true)}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-all ${
+              isCredit
+                ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                : "border-border text-muted-foreground hover:border-blue-500/40"
+            }`}
+          >
+            Crédito
+          </button>
         </div>
       </div>
       {error && <p className="text-sm text-red-500">{error}</p>}
