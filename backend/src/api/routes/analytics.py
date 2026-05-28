@@ -44,7 +44,10 @@ def get_summary(
 ):
     transactions = (
         db.query(TransactionModel)
-        .filter(TransactionModel.user_id == current_user.id)
+        .filter(
+            TransactionModel.user_id == current_user.id,
+            TransactionModel.is_paid == True,  # noqa: E712
+        )
         .all()
     )
     df = _transactions_to_df(transactions)
@@ -52,9 +55,9 @@ def get_summary(
     real = df[df["type"] != "transfer"] if not df.empty else df
 
     income = round(float(real[real["type"] == "income"]
-                   ["amount"].sum()), 2) if not real.empty else 0.0
+                         ["amount"].sum()), 2) if not real.empty else 0.0
     expense = round(float(real[real["type"] == "expense"]
-                    ["amount"].sum()), 2) if not real.empty else 0.0
+                          ["amount"].sum()), 2) if not real.empty else 0.0
 
     accounts = (
         db.query(AccountModel)
@@ -83,6 +86,7 @@ def get_monthly(
         .filter(
             TransactionModel.user_id == current_user.id,
             TransactionModel.type != "transfer",
+            TransactionModel.is_paid == True,  # noqa: E712
         )
         .all()
     )
@@ -123,6 +127,7 @@ def get_by_category(
         .filter(
             TransactionModel.user_id == current_user.id,
             TransactionModel.type != "transfer",
+            TransactionModel.is_paid == True,  # noqa: E712
         )
         .all()
     )
@@ -175,6 +180,7 @@ def get_trends(
         .filter(
             TransactionModel.user_id == current_user.id,
             TransactionModel.type != "transfer",
+            TransactionModel.is_paid == True,  # noqa: E712
         )
         .all()
     )
@@ -232,6 +238,7 @@ def get_recurring_average(
             TransactionModel.user_id == current_user.id,
             TransactionModel.type == "expense",
             TransactionModel.is_recurring == True,  # noqa: E712
+            TransactionModel.is_paid == True,  # noqa: E712
         )
         .all()
     )
@@ -301,6 +308,7 @@ def compare_months(
         .filter(
             TransactionModel.user_id == current_user.id,
             TransactionModel.type != "transfer",
+            TransactionModel.is_paid == True,  # noqa: E712
         )
         .all()
     )
@@ -343,4 +351,66 @@ def compare_months(
             "expense": variation(summary_a["expense"], summary_b["expense"]),
             "balance": variation(summary_a["balance"], summary_b["balance"]),
         },
+    }
+
+
+@router.get("/future-commitments")
+def get_future_commitments(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Parcelas pendentes agrupadas por mês."""
+    transactions = (
+        db.query(TransactionModel)
+        .filter(
+            TransactionModel.user_id == current_user.id,
+            TransactionModel.is_paid == False,  # noqa: E712
+            TransactionModel.type == "expense",
+            TransactionModel.installment_group_id != None,  # noqa: E711
+        )
+        .all()
+    )
+
+    if not transactions:
+        return {"total_pending": 0.0, "by_month": [], "by_group": []}
+
+    df = _transactions_to_df(transactions)
+    df["month"] = df["date"].dt.to_period("M").astype(str)
+
+    total_pending = round(float(df["amount"].sum()), 2)
+
+    # Por mês
+    by_month = (
+        df.groupby("month")["amount"]
+        .sum()
+        .reset_index()
+        .rename(columns={"amount": "total"})
+    )
+    by_month["total"] = by_month["total"].round(2)
+    by_month_list = sorted(
+        by_month.to_dict(orient="records"),
+        key=lambda x: x["month"]
+    )
+
+    # Por grupo de parcelamento
+    by_group = []
+    groups = df.groupby(
+        "transfer_id" if "transfer_id" in df.columns else "installment_group_id")
+
+    # Agrupa por installment_group_id
+    for group_id, group_df in df.groupby("installment_group_id"):
+        by_group.append({
+            "installment_group_id": group_id,
+            "description": group_df.iloc[0]["description"],
+            "installment_total": int(group_df["installment_total"].iloc[0]) if "installment_total" in group_df.columns else 0,
+            "remaining_installments": len(group_df),
+            "remaining_total": round(float(group_df["amount"].sum()), 2),
+            "installment_amount": round(float(group_df["amount"].iloc[0]), 2),
+            "next_due": group_df["date"].min().strftime("%Y-%m-%d"),
+        })
+
+    return {
+        "total_pending": total_pending,
+        "by_month": by_month_list,
+        "by_group": sorted(by_group, key=lambda x: x["next_due"]),
     }

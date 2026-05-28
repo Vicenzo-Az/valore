@@ -67,7 +67,28 @@ def create_transaction(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # Transação simples (sem parcelamento)
+    # Busca a conta selecionada
+    account = None
+    if input.account_id:
+        account = db.query(AccountModel).filter(
+            AccountModel.id == input.account_id,
+            AccountModel.user_id == current_user.id,
+        ).first()
+
+    # Parcelamento só em conta de crédito
+    if input.installments > 1:
+        if not account or not account.is_credit:
+            raise HTTPException(
+                status_code=400,
+                detail="Parcelamento só é permitido em contas de crédito"
+            )
+        if input.type == "income":
+            raise HTTPException(
+                status_code=400,
+                detail="Receitas não podem ser parceladas"
+            )
+
+    # Transação simples
     if input.installments <= 1:
         transaction = TransactionModel(
             id=str(uuid4()),
@@ -104,7 +125,7 @@ def create_transaction(
             category_id=input.category_id,
             account_id=input.account_id,
             is_recurring=False,
-            is_paid=i == 0,  # só a primeira parcela começa como paga
+            is_paid=i == 0,
             installment_group_id=installment_group_id,
             installment_number=i + 1,
             installment_total=input.installments,
