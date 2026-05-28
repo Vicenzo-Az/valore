@@ -247,3 +247,20 @@ def delete_transaction(
         db.delete(transaction)
 
     db.commit()
+
+
+@router.delete("/{transaction_id}/single", status_code=204)
+def delete_single_transaction(
+    transaction_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Deleta só esta parcela, mantendo as demais do grupo."""
+    transaction = db.query(TransactionModel).filter(
+        TransactionModel.id == transaction_id,
+        TransactionModel.user_id == current_user.id,
+    ).first()
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transação não encontrada")
+    db.delete(transaction)
+    db.commit()
