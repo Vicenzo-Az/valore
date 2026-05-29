@@ -64,8 +64,13 @@ function amountClass(transaction: Transaction): string {
 }
 
 export default function Transactions() {
-  const { transactions, addTransaction, removeTransaction, updateTransaction } =
-    useTransactions();
+  const {
+    transactions,
+    addTransaction,
+    removeTransaction,
+    updateTransaction,
+    removeTransactionGroup,
+  } = useTransactions();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -834,14 +839,16 @@ export default function Transactions() {
                 <Button
                   variant="outline"
                   className="border-red-500/40 text-red-500 hover:bg-red-500/10"
-                  onClick={() => {
-                    if (deleteTarget) {
-                      removeTransaction(deleteTarget.id); // usa o endpoint existente que deleta o grupo
+                  onClick={async () => {
+                    if (deleteTarget?.installment_group_id) {
+                      await removeTransactionGroup(
+                        deleteTarget.installment_group_id,
+                      );
                       setDeleteTarget(null);
                     }
                   }}
                 >
-                  Deletar todas as parcelas restantes
+                  Deletar todas as parcelas
                 </Button>
                 <Button variant="ghost" onClick={() => setDeleteTarget(null)}>
                   Cancelar

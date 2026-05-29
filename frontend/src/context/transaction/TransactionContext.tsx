@@ -82,6 +82,24 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
   const clearTransactions = () => setTransactions([]);
 
+  const removeTransactionGroup = async (groupId: string) => {
+    try {
+      setError(null);
+      // Pega o id de qualquer transação do grupo para chamar o endpoint
+      const anyTransaction = transactions.find(
+        (t) => t.installment_group_id === groupId,
+      );
+      if (!anyTransaction) return;
+      await apiDelete(anyTransaction.id);
+      // Remove todas do grupo do estado local
+      setTransactions((prev) =>
+        prev.filter((t) => t.installment_group_id !== groupId),
+      );
+    } catch {
+      setError("Erro ao remover parcelas.");
+    }
+  };
+
   const removeSingleFromState = (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
   };
@@ -97,6 +115,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         updateTransaction,
         clearTransactions,
         removeSingleFromState,
+        removeTransactionGroup,
       }}
     >
       {children}
