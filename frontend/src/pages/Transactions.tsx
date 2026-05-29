@@ -256,7 +256,6 @@ export default function Transactions() {
     };
 
     if (editApplyToAll && editingTransaction?.installment_group_id) {
-      // Atualiza todas as parcelas restantes (não pagas) do grupo
       const remainingInstallments = transactions.filter(
         (t) =>
           t.installment_group_id === editingTransaction.installment_group_id &&
@@ -266,7 +265,12 @@ export default function Transactions() {
       await Promise.all([
         updateTransaction(editingId, payload),
         ...remainingInstallments.map((t) =>
-          updateTransaction(t.id, { amount: Number(editAmount) }),
+          updateTransaction(t.id, {
+            amount: Number(editAmount),
+            description: editDescription.trim(),
+            category_id: editCategoryId || null,
+            account_id: editAccountId || null,
+          }),
         ),
       ]);
     } else {
@@ -674,23 +678,6 @@ export default function Transactions() {
               {editErrors.amount && (
                 <p className="text-sm text-red-500 mt-1">{editErrors.amount}</p>
               )}
-              {editingTransaction?.installment_group_id && (
-                <div className="flex items-center gap-3 mt-2">
-                  <input
-                    type="checkbox"
-                    id="edit_apply_to_all"
-                    checked={editApplyToAll}
-                    onChange={(e) => setEditApplyToAll(e.target.checked)}
-                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
-                  />
-                  <label
-                    htmlFor="edit_apply_to_all"
-                    className="text-xs text-muted-foreground cursor-pointer select-none"
-                  >
-                    Aplicar valor a todas as parcelas restantes
-                  </label>
-                </div>
-              )}
             </div>
 
             {/* Tipo — oculto para parcelas */}
@@ -737,6 +724,24 @@ export default function Transactions() {
                 ))}
               </SelectContent>
             </Select>
+
+            {editingTransaction?.installment_group_id && (
+              <div className="flex items-center gap-3 mt-2">
+                <input
+                  type="checkbox"
+                  id="edit_apply_to_all"
+                  checked={editApplyToAll}
+                  onChange={(e) => setEditApplyToAll(e.target.checked)}
+                  className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="edit_apply_to_all"
+                  className="text-xs text-muted-foreground cursor-pointer select-none"
+                >
+                  Aplicar mudanças a todas as parcelas restantes
+                </label>
+              </div>
+            )}
 
             {/* Data — sem restrição de data futura para parcelas */}
             <div>
