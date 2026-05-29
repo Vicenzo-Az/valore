@@ -4,6 +4,7 @@ import {
   deleteTransaction as apiDelete,
   getTransactions as apiGetAll,
   updateTransaction as apiUpdate,
+  deleteSingleTransaction,
 } from "@/services/transactionService";
 import type {
   CreateTransactionInput,
@@ -82,6 +83,16 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
   const clearTransactions = () => setTransactions([]);
 
+  const removeSingleTransaction = async (id: string) => {
+    try {
+      setError(null);
+      await deleteSingleTransaction(id);
+      setTransactions((prev) => prev.filter((t) => t.id !== id));
+    } catch {
+      setError("Erro ao remover parcela.");
+    }
+  };
+
   const removeTransactionGroup = async (groupId: string) => {
     try {
       setError(null);
@@ -116,6 +127,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         clearTransactions,
         removeSingleFromState,
         removeTransactionGroup,
+        removeSingleTransaction,
       }}
     >
       {children}

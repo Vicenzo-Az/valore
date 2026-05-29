@@ -17,4 +17,5 @@ export interface TransactionContextType {
   clearTransactions: () => void;
   removeSingleFromState: (id: string) => void;
   removeTransactionGroup: (groupId: string) => Promise<void>;
+  removeSingleTransaction: (id: string) => Promise<void>;
 }

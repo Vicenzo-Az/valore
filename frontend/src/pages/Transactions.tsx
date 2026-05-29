@@ -1,10 +1,7 @@
 import { useTransactions } from "@/context";
 import { getAccounts } from "@/services/accountService";
 import { getCategories } from "@/services/categoryService";
-import {
-  createTransfer,
-  deleteSingleTransaction,
-} from "@/services/transactionService";
+import { createTransfer } from "@/services/transactionService";
 import type { Account, Category, Transaction } from "@/types";
 import { useEffect, useMemo, useState } from "react";
 
@@ -70,6 +67,7 @@ export default function Transactions() {
     removeTransaction,
     updateTransaction,
     removeTransactionGroup,
+    removeSingleTransaction,
   } = useTransactions();
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -828,9 +826,8 @@ export default function Transactions() {
                   variant="destructive"
                   onClick={async () => {
                     if (deleteTarget) {
-                      await deleteSingleTransaction(deleteTarget.id);
+                      await removeSingleTransaction(deleteTarget.id);
                       setDeleteTarget(null);
-                      window.location.reload();
                     }
                   }}
                 >
