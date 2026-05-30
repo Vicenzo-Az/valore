@@ -240,6 +240,9 @@ export default function Accounts() {
   const [isSaving, setIsSaving] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [deleteAccountTarget, setDeleteAccountTarget] =
+    useState<Account | null>(null);
+  const [deleteAccountError, setDeleteAccountError] = useState("");
 
   async function load() {
     try {
@@ -279,9 +282,24 @@ export default function Accounts() {
     }
   }
 
-  async function handleDelete(id: string) {
-    await deleteAccount(id);
-    setAccounts((prev) => prev.filter((a) => a.id !== id));
+  async function handleDelete(force = false) {
+    if (!deleteAccountTarget) return;
+    try {
+      await deleteAccount(deleteAccountTarget.id, force);
+      setAccounts((prev) =>
+        prev.filter((a) => a.id !== deleteAccountTarget.id),
+      );
+      setDeleteAccountTarget(null);
+      setDeleteAccountError("");
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })
+        ?.response?.data?.detail;
+      if (detail?.includes("transação")) {
+        setDeleteAccountError(detail);
+      } else {
+        setDeleteAccountError("Erro ao deletar conta.");
+      }
+    }
   }
 
   const totalNetWorth = accounts.reduce((acc, a) => acc + a.current_balance, 0);
@@ -356,7 +374,11 @@ export default function Accounts() {
               key={account.id}
               account={account}
               onEdit={setEditingAccount}
-              onDelete={handleDelete}
+              onDelete={(id) =>
+                setDeleteAccountTarget(
+                  accounts.find((a) => a.id === id) ?? null,
+                )
+              }
             />
           ))}
         </div>
@@ -378,6 +400,77 @@ export default function Accounts() {
               isLoading={isSaving}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!deleteAccountTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteAccountTarget(null);
+            setDeleteAccountError("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Deletar conta</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <p className="text-sm text-muted-foreground">
+              Tem certeza que deseja deletar a conta{" "}
+              <span className="font-semibold">{deleteAccountTarget?.name}</span>
+              ?
+            </p>
+            {deleteAccountError && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 space-y-3">
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  {deleteAccountError}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Ao confirmar, as transações vinculadas perderão a conta
+                  associada.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    className="flex-1"
+                    onClick={() => {
+                      setDeleteAccountTarget(null);
+                      setDeleteAccountError("");
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => handleDelete(true)}
+                  >
+                    Deletar mesmo assim
+                  </Button>
+                </div>
+              </div>
+            )}
+            {!deleteAccountError && (
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  className="flex-1"
+                  onClick={() => setDeleteAccountTarget(null)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => handleDelete(false)}
+                >
+                  Deletar
+                </Button>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
