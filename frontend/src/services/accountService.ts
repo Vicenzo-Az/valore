@@ -21,6 +21,12 @@ export async function updateAccount(
   return data;
 }
 
-export async function deleteAccount(id: string, force = false): Promise<void> {
-  await api.delete(`/accounts/${id}`, { params: { force } });
+export async function deleteAccount(
+  id: string,
+  force = false,
+  deleteTransactions = false,
+): Promise<void> {
+  await api.delete(`/accounts/${id}`, {
+    params: { force, delete_transactions: deleteTransactions },
+  });
 }

@@ -282,10 +282,10 @@ export default function Accounts() {
     }
   }
 
-  async function handleDelete(force = false) {
+  async function handleDelete(force = false, deleteTransactions = false) {
     if (!deleteAccountTarget) return;
     try {
-      await deleteAccount(deleteAccountTarget.id, force);
+      await deleteAccount(deleteAccountTarget.id, force, deleteTransactions);
       setAccounts((prev) =>
         prev.filter((a) => a.id !== deleteAccountTarget.id),
       );
@@ -428,26 +428,30 @@ export default function Accounts() {
                   {deleteAccountError}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Ao confirmar, as transações vinculadas perderão a conta
-                  associada.
+                  Escolha como deseja proceder:
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDelete(false, true)}
+                  >
+                    Deletar conta e todas as transações vinculadas
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-amber-500/40 text-amber-600 hover:bg-amber-500/10"
+                    onClick={() => handleDelete(true, false)}
+                  >
+                    Deletar só a conta (transações perdem o vínculo)
+                  </Button>
                   <Button
                     variant="ghost"
-                    className="flex-1"
                     onClick={() => {
                       setDeleteAccountTarget(null);
                       setDeleteAccountError("");
                     }}
                   >
                     Cancelar
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1"
-                    onClick={() => handleDelete(true)}
-                  >
-                    Deletar mesmo assim
                   </Button>
                 </div>
               </div>
