@@ -111,8 +111,16 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
     }
   };
 
+  const clearTransactionsByAccount = (accountId: string) => {
+    setTransactions((prev) => prev.filter((t) => t.account_id !== accountId));
+  };
+
   const removeSingleFromState = (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const addTransactions = (newTransactions: Transaction[]) => {
+    setTransactions((prev) => [...newTransactions, ...prev]);
   };
 
   return (
@@ -128,6 +136,8 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         removeSingleFromState,
         removeTransactionGroup,
         removeSingleTransaction,
+        clearTransactionsByAccount,
+        addTransactions,
       }}
     >
       {children}

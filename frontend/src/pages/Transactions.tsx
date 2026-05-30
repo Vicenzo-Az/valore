@@ -64,6 +64,7 @@ export default function Transactions() {
   const {
     transactions,
     addTransaction,
+    addTransactions,
     removeTransaction,
     updateTransaction,
     removeTransactionGroup,
@@ -211,7 +212,7 @@ export default function Transactions() {
     setCategoryId("");
     setAccountId("");
     setInstallments(1);
-    setDate("");
+    setDate(todayISO);
     setAddOpen(false);
     setIsRecurring(false);
   }
@@ -297,15 +298,21 @@ export default function Transactions() {
       return;
     }
     try {
-      await createTransfer({
+      const created = await createTransfer({
         from_account_id: transferFrom,
         to_account_id: transferTo,
         amount: Number(transferAmount),
         date: transferDate,
         description: transferDescription || "Transferência entre contas",
       });
-      // Recarrega as transações
-      window.location.reload();
+      // Adiciona as duas transações geradas ao estado local
+      addTransactions(created);
+      setIsTransferOpen(false);
+      setTransferFrom("");
+      setTransferTo("");
+      setTransferAmount("");
+      setTransferDate("");
+      setTransferDescription("Transferência entre contas");
     } catch {
       setTransferError("Erro ao realizar transferência");
     }

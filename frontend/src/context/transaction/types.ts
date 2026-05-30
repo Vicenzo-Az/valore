@@ -9,12 +9,14 @@ export interface TransactionContextType {
   isLoading: boolean;
   error: string | null;
   addTransaction: (transaction: CreateTransactionInput) => Promise<void>;
+  addTransactions: (transactions: Transaction[]) => void;
   removeTransaction: (id: string) => Promise<void>;
   updateTransaction: (
     id: string,
     transaction: UpdateTransactionInput,
   ) => Promise<void>;
   clearTransactions: () => void;
+  clearTransactionsByAccount: (accountId: string) => void;
   removeSingleFromState: (id: string) => void;
   removeTransactionGroup: (groupId: string) => Promise<void>;
   removeSingleTransaction: (id: string) => Promise<void>;

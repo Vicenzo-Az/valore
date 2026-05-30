@@ -8,6 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useTransactions } from "@/context/transaction/useTransactions";
 import {
   createAccount,
   deleteAccount,
@@ -243,6 +244,7 @@ export default function Accounts() {
   const [deleteAccountTarget, setDeleteAccountTarget] =
     useState<Account | null>(null);
   const [deleteAccountError, setDeleteAccountError] = useState("");
+  const { clearTransactionsByAccount } = useTransactions();
 
   async function load() {
     try {
@@ -289,6 +291,10 @@ export default function Accounts() {
       setAccounts((prev) =>
         prev.filter((a) => a.id !== deleteAccountTarget.id),
       );
+      if (deleteTransactions) {
+        // Remove do contexto de transações todas vinculadas a essa conta
+        clearTransactionsByAccount(deleteAccountTarget.id);
+      }
       setDeleteAccountTarget(null);
       setDeleteAccountError("");
     } catch (err: unknown) {
