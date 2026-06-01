@@ -1,9 +1,10 @@
 import { useTransactions } from "@/context";
 import { getAccounts } from "@/services/accountService";
 import { getCategories } from "@/services/categoryService";
+import { getHint } from "@/services/hintService";
 import { createTransfer } from "@/services/transactionService";
 import type { Account, Category, Transaction } from "@/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -141,6 +142,20 @@ export default function Transactions() {
       .catch(() => {});
   }, []);
 
+  const categoryWasManuallySet = useRef(false);
+
+  // useEffect que dispara quando a descrição muda
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      if (description.trim().length >= 3 && !categoryWasManuallySet.current) {
+        const suggested = await getHint(description);
+        if (suggested) setCategoryId(suggested);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [description]);
+
   // CORRETO — três blocos separados no nível do componente:
 
   const filteredTransactions = useMemo(() => {
@@ -215,6 +230,8 @@ export default function Transactions() {
     setDate(todayISO);
     setAddOpen(false);
     setIsRecurring(false);
+
+    categoryWasManuallySet.current = false;
   }
 
   function handleEditClick(t: Transaction) {
@@ -459,7 +476,13 @@ export default function Transactions() {
                     <SelectItem value="expense">Despesa</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select value={categoryId} onValueChange={setCategoryId}>
+                <Select
+                  value={categoryId}
+                  onValueChange={(v) => {
+                    setCategoryId(v);
+                    categoryWasManuallySet.current = true;
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Categoria (opcional)" />
                   </SelectTrigger>
