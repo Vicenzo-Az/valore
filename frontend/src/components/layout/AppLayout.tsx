@@ -15,7 +15,7 @@ export function AppLayout({ children }: Props) {
       {/* Overlay mobile */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/60 md:hidden"
+          className="fixed inset-0 z-20 bg-muted/40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
