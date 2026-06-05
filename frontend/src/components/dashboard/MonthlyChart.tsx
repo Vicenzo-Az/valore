@@ -41,7 +41,11 @@ export function MonthlyChart({ data }: Props) {
       <h3 className="text-lg font-medium mb-6">Evolução Mensal</h3>
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
+          <LineChart
+            data={chartData}
+            margin={{ left: 10, right: 10, top: 5, bottom: 5 }}
+          >
+            {" "}
             <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
             <XAxis dataKey="month" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />

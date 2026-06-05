@@ -62,7 +62,11 @@ export function IncomeExpenseChart({ income, expenses }: Props) {
       <h3 className="text-lg font-medium mb-6">Receita vs Despesas</h3>
 
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data}>
+        <BarChart
+          data={data}
+          margin={{ left: 10, right: 10, top: 5, bottom: 5 }}
+        >
+          {" "}
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
