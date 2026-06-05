@@ -34,7 +34,9 @@ import {
   ArrowLeftRight,
   Calendar,
   Check,
+  Pencil,
   RefreshCw,
+  Trash2,
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
@@ -711,10 +713,9 @@ export default function Transactions() {
 
       {/* Filtros */}
       <div className="space-y-3">
-        {/* Linha 1 — filtros de tipo, conta e categoria */}
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-36 md:w-40">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
@@ -725,7 +726,7 @@ export default function Transactions() {
             </SelectContent>
           </Select>
           <Select value={filterAccount} onValueChange={setFilterAccount}>
-            <SelectTrigger className="w-44">
+            <SelectTrigger className="w-36 md:w-44">
               <SelectValue placeholder="Conta" />
             </SelectTrigger>
             <SelectContent>
@@ -738,7 +739,7 @@ export default function Transactions() {
             </SelectContent>
           </Select>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-44">
+            <SelectTrigger className="w-36 md:w-44">
               <SelectValue placeholder="Categoria" />
             </SelectTrigger>
             <SelectContent>
@@ -751,35 +752,33 @@ export default function Transactions() {
             </SelectContent>
           </Select>
         </div>
-
-        {/* Linha 2 — filtro por período */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 md:gap-3 flex-wrap">
           <span className="text-sm text-muted-foreground font-medium flex items-center gap-1.5">
             <Calendar size={14} />
-            Período:
+            <span className="hidden sm:inline">Período:</span>
           </span>
           <div className="flex items-center gap-2">
             <label className="text-xs text-muted-foreground">De</label>
-            <div className="flex items-center border border-border rounded-md px-3 h-9">
+            <div className="flex items-center border border-border rounded-md px-2 md:px-3 h-9">
               <input
                 type="date"
                 value={filterDateFrom}
                 onChange={(e) => setFilterDateFrom(e.target.value)}
                 max={filterDateTo || todayISO}
-                className="text-sm bg-transparent outline-none w-32"
+                className="text-sm bg-transparent outline-none w-28 md:w-32"
               />
             </div>
           </div>
           <div className="flex items-center gap-2">
             <label className="text-xs text-muted-foreground">Até</label>
-            <div className="flex items-center border border-border rounded-md px-3 h-9">
+            <div className="flex items-center border border-border rounded-md px-2 md:px-3 h-9">
               <input
                 type="date"
                 value={filterDateTo}
                 onChange={(e) => setFilterDateTo(e.target.value)}
                 min={filterDateFrom || undefined}
                 max={todayISO}
-                className="text-sm bg-transparent outline-none w-32"
+                className="text-sm bg-transparent outline-none w-28 md:w-32"
               />
             </div>
           </div>
@@ -791,7 +790,7 @@ export default function Transactions() {
               }}
               className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
             >
-              Limpar período
+              Limpar
             </button>
           )}
         </div>
@@ -1058,60 +1057,145 @@ export default function Transactions() {
                 </span>
               </div>
 
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Descrição</TableHead>
-                    <TableHead>Categoria</TableHead>
-                    <TableHead>Conta</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead className="text-center">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <div
+                key={monthKey}
+                className="rounded-xl border border-border bg-card overflow-hidden"
+              >
+                {/* Cabeçalho do mês */}
+                <div className="px-4 md:px-6 py-3 bg-muted/40 border-b border-border flex items-center justify-between">
+                  <span className="text-sm font-semibold capitalize">
+                    {formatMonthHeader(monthKey)}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {monthTransactions.length} transação
+                    {monthTransactions.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                {/* Desktop — tabela */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Descrição</TableHead>
+                        <TableHead>Categoria</TableHead>
+                        <TableHead>Conta</TableHead>
+                        <TableHead className="text-right">Valor</TableHead>
+                        <TableHead className="text-center">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {monthTransactions.map((t) => (
+                        <TableRow key={t.id}>
+                          <TableCell>{formatDate(t.date)}</TableCell>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {t.type === "transfer" && (
+                                <ArrowLeftRight
+                                  size={14}
+                                  className="text-blue-400 shrink-0"
+                                />
+                              )}
+                              {t.description}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {getCategoryName(t.category_id)}
+                          </TableCell>
+                          <TableCell>{getAccountName(t.account_id)}</TableCell>
+                          <TableCell className={amountClass(t)}>
+                            {formatAmount(t)}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {t.type !== "transfer" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditClick(t)}
+                              >
+                                Editar
+                              </Button>
+                            )}
+                            <span className="mx-1" />
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setDeleteTarget(t)}
+                            >
+                              {t.type === "transfer" ? "Cancelar" : "Deletar"}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile — cards */}
+                <div className="md:hidden divide-y divide-border">
                   {monthTransactions.map((t) => (
-                    <TableRow key={t.id}>
-                      <TableCell>{formatDate(t.date)}</TableCell>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
+                    <div
+                      key={t.id}
+                      className="px-4 py-3 flex items-center justify-between gap-3"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
                           {t.type === "transfer" && (
                             <ArrowLeftRight
-                              size={14}
+                              size={12}
                               className="text-blue-400 shrink-0"
                             />
                           )}
-                          {t.description}
+                          <p className="text-sm font-medium truncate">
+                            {t.description}
+                          </p>
                         </div>
-                      </TableCell>
-                      <TableCell>{getCategoryName(t.category_id)}</TableCell>
-                      <TableCell>{getAccountName(t.account_id)}</TableCell>
-                      <TableCell className={amountClass(t)}>
-                        {formatAmount(t)}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {t.type !== "transfer" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditClick(t)}
-                          >
-                            Editar
-                          </Button>
-                        )}
-                        <span className="mx-1" />
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setDeleteTarget(t)}
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(t.date)}
+                          {getCategoryName(t.category_id) !== "—" &&
+                            ` · ${getCategoryName(t.category_id)}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`text-sm font-semibold ${
+                            t.type === "transfer"
+                              ? t.transfer_direction === "out"
+                                ? "text-blue-400"
+                                : "text-blue-500"
+                              : t.type === "income"
+                                ? "text-emerald-500"
+                                : "text-red-500"
+                          }`}
                         >
-                          {t.type === "transfer" ? "Cancelar" : "Deletar"}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+                          {formatAmount(t)}
+                        </span>
+                        <div className="flex gap-1">
+                          {t.type !== "transfer" && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={() => handleEditClick(t)}
+                            >
+                              <Pencil size={13} />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-red-500"
+                            onClick={() => setDeleteTarget(t)}
+                          >
+                            <Trash2 size={13} />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              </div>
             </div>
           ))
         )}
