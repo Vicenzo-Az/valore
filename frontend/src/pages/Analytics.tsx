@@ -229,7 +229,8 @@ export default function Analytics() {
           <h2 className="text-lg font-semibold mb-4">Ranking de Despesas</h2>
           <Card>
             <CardContent className="p-0">
-              <table className="w-full text-sm">
+              {/* Desktop */}
+              <table className="w-full text-sm hidden md:table">
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left px-6 py-3 text-muted-foreground font-medium">
@@ -294,6 +295,43 @@ export default function Analytics() {
                   })}
                 </tbody>
               </table>
+
+              {/* Mobile */}
+              <div className="md:hidden divide-y divide-border">
+                {expenseByCategory.map((cat, index) => {
+                  const totalExpense = expenseByCategory.reduce(
+                    (acc, c) => acc + c.total,
+                    0,
+                  );
+                  const pct =
+                    totalExpense > 0
+                      ? ((cat.total / totalExpense) * 100).toFixed(1)
+                      : "0";
+                  return (
+                    <div
+                      key={cat.category_id}
+                      className="px-4 py-3 flex items-center gap-3"
+                    >
+                      <span className="text-xs text-muted-foreground w-4">
+                        {index + 1}
+                      </span>
+                      <span
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: cat.category_color }}
+                      />
+                      <span className="flex-1 text-sm">
+                        {cat.category_name}
+                      </span>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-red-400">
+                          R$ {cat.total.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{pct}%</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -420,7 +458,8 @@ export default function Analytics() {
             {/* Por compra */}
             <Card>
               <CardContent className="p-0">
-                <table className="w-full text-sm">
+                {/* Desktop */}
+                <table className="w-full text-sm hidden md:table">
                   <thead>
                     <tr className="border-b border-border">
                       <th className="text-left px-6 py-3 text-muted-foreground font-medium">
@@ -472,6 +511,41 @@ export default function Analytics() {
                     ))}
                   </tbody>
                 </table>
+
+                {/* Mobile */}
+                <div className="md:hidden divide-y divide-border">
+                  {futureCommitments.by_group.map((group) => (
+                    <div
+                      key={group.installment_group_id}
+                      className="px-4 py-3 space-y-1"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium">
+                          {group.description}
+                        </p>
+                        <p className="text-sm font-medium text-red-400">
+                          R$ {group.remaining_total.toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>
+                          {group.remaining_installments}/
+                          {group.installment_total} parcelas · R${" "}
+                          {group.installment_amount.toFixed(2)}/mês
+                        </span>
+                        <span>
+                          Venc.{" "}
+                          {new Date(
+                            group.next_due + "T00:00:00",
+                          ).toLocaleDateString("pt-BR", {
+                            day: "2-digit",
+                            month: "short",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
