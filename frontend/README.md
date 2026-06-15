@@ -40,6 +40,7 @@ frontend/
 │   ├── context/
 │   │   ├── transaction/
 │   │   │   ├── TransactionContext.tsx
+│   │   │   ├── TransactionContext.test.tsx
 │   │   │   ├── transactionInstance.ts
 │   │   │   ├── types.ts
 │   │   │   └── useTransactions.ts
@@ -65,16 +66,24 @@ frontend/
 │   │   ├── accountService.ts
 │   │   ├── analyticsService.ts
 │   │   ├── categoryService.ts
-│   │   └── transactionService.ts
+│   │   ├── hintService.ts
+│   │   ├── transactionService.ts
+│   │   └── transactionService.test.ts
 │   ├── types/
 │   │   ├── finance.ts
 │   │   ├── transaction.ts
 │   │   └── index.ts
+│   ├── utils/
+│   │   ├── transactionFormat.ts
+│   │   └── transactionFormat.test.ts
+│   ├── test/
+│   │   └── setup.ts
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── index.css
 ├── public/
 ├── vercel.json
+├── vite.config.ts
 ├── index.html
 └── package.json
 ```
@@ -114,7 +123,7 @@ npm install
 npm run dev
 ```
 
-O app fica disponível em <http://localhost:5173>.
+O app fica disponível em http://localhost:5173.
 
 Em desenvolvimento, o Axios aponta para `http://localhost:8000` via variável de ambiente. Crie `.env.local` se necessário:
 
@@ -126,12 +135,35 @@ VITE_API_URL=http://localhost:8000
 
 ## Scripts
 
-| Comando           | Descrição                   |
-| ----------------- | --------------------------- |
-| `npm run dev`     | Servidor de desenvolvimento |
-| `npm run build`   | Build de produção           |
-| `npm run lint`    | ESLint                      |
-| `npm run preview` | Serve a build localmente    |
+| Comando            | Descrição                       |
+| ------------------ | ------------------------------- |
+| `npm run dev`      | Servidor de desenvolvimento     |
+| `npm run build`    | Build de produção               |
+| `npm run lint`     | ESLint                          |
+| `npm run preview`  | Serve a build localmente        |
+| `npm run test`     | Testes em modo watch (Vitest)   |
+| `npm run test:run` | Executa todos os testes uma vez |
+| `npm run test:ui`  | Interface visual do Vitest      |
+
+---
+
+## Testes
+
+```bash
+npm run test:run
+```
+
+25 testes cobrindo três frentes:
+
+| Arquivo                                           | Cobertura                                                                                    |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `utils/transactionFormat.test.ts`                 | Formatação de valores, classes de estilo condicionais, agrupamento de transações por mês     |
+| `services/transactionService.test.ts`             | Chamadas corretas à API (Axios mockado) para CRUD, parcelas e transferências                 |
+| `context/transaction/TransactionContext.test.tsx` | Atualizações de estado: adicionar, editar, remover transação/parcela/grupo, limpar por conta |
+
+**Resultado atual: 25/25 (100%) de aprovação.**
+
+Complementarmente, a interface é validada manualmente: fluxo de autenticação, CRUD de contas e transações, parcelamento, transferências, navegação entre análises, dark/light mode e responsividade (Chrome/Firefox DevTools + iPhone físico).
 
 ---
 
@@ -158,3 +190,4 @@ O `vercel.json` configura proxy para o backend e rewrites para o React Router:
   ]
 }
 ```
+

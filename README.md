@@ -8,8 +8,8 @@ O sistema permite registrar receitas, despesas e transferências entre contas, c
 
 ## Produção
 
-- **Frontend:** <https://valore-finance.vercel.app>
-- **Backend:** <https://valore-api-279d7c3cc379.herokuapp.com>
+- **Frontend:** https://valore-finance.vercel.app
+- **Backend:** https://valore-api-279d7c3cc379.herokuapp.com
 
 ---
 
@@ -66,12 +66,14 @@ finance-tracker/
 
 - **Autenticação** — registro, login e logout com JWT em cookie `httpOnly`
 - **Contas financeiras** — contas de débito e crédito com saldo calculado automaticamente
-- **Transações** — CRUD completo com categorias, filtros por período, conta e categoria
+- **Transações** — CRUD completo com categorias, filtros por período, conta e categoria, agrupamento mensal
 - **Transferências** — movimentação entre contas do mesmo usuário
-- **Parcelamento** — compras parceladas em contas de crédito com controle de parcelas pagas/pendentes
+- **Parcelamento** — compras parceladas em contas de crédito, com cálculo automático de valores e datas, controle de parcelas pagas/pendentes e edição individual ou em lote das parcelas restantes
 - **Categorias** — categorias do sistema + personalizadas pelo usuário
-- **Análises** — dashboard com gráficos, evolução mensal, ranking de categorias, despesas recorrentes, compromissos futuros e comparativo entre meses
+- **Autocomplete de categorias** — sugestão automática de categoria com base no histórico de descrições do usuário
+- **Análises** — dashboard com gráficos, evolução mensal, ranking de categorias, despesas recorrentes, compromissos futuros (regime de competência) e comparativo entre meses específicos
 - **Perfil** — edição de nome, e-mail, senha e avatar
+- **Responsividade** — layout adaptado para desktop, tablet e mobile, com sidebar em overlay e listagens em cards no mobile
 
 ---
 
@@ -137,14 +139,33 @@ heroku run "cd backend && alembic upgrade head" --app valore-api
 
 Com o backend rodando localmente:
 
-- Swagger UI: <http://127.0.0.1:8000/docs>
-- ReDoc: <http://127.0.0.1:8000/redoc>
+- Swagger UI: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
 
 ---
 
 ## Testes
 
+### Backend (Pytest)
+
 ```bash
 cd backend
 pytest
 ```
+
+68 testes cobrindo autenticação, isolamento entre usuários, contas (débito/crédito), transações, parcelamento, transferências e analytics. Executados em banco PostgreSQL de teste (`valore_test`), criado e limpo a cada execução.
+
+### Frontend (Vitest)
+
+```bash
+cd frontend
+npm run test:run
+```
+
+25 testes cobrindo funções utilitárias de formatação, camada de serviços (API mockada) e o contexto de transações.
+
+**Total: 93 testes automatizados, 100% de aprovação.**
+
+25 testes cobrindo funções utilitárias de formatação, camada de serviços (API mockada) e o contexto de transações.
+
+**Total: 93 testes automatizados, 100% de aprovação.**

@@ -42,7 +42,8 @@ backend/
 │   │   ├── user.py
 │   │   ├── account.py
 │   │   ├── transaction.py
-│   │   └── category.py
+│   │   ├── category.py
+│   │   └── description_hint.py
 │   ├── schemas/
 │   │   ├── user.py
 │   │   ├── account.py
@@ -57,6 +58,12 @@ backend/
 │   └── main.py
 ├── alembic/
 ├── tests/
+│   ├── conftest.py
+│   ├── test_auth.py
+│   ├── test_accounts.py
+│   ├── test_transactions.py
+│   └── test_analytics.py
+├── pytest.ini
 ├── requirements.txt
 └── README.md
 ```
@@ -93,8 +100,8 @@ uvicorn src.main:app --reload
 
 Documentação interativa disponível em:
 
-- Swagger: <http://127.0.0.1:8000/docs>
-- ReDoc: <http://127.0.0.1:8000/redoc>
+- Swagger: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
 
 ---
 
@@ -129,6 +136,13 @@ Documentação interativa disponível em:
 | DELETE | `/transactions/{id}`        | Remove transação ou grupo                           |
 | DELETE | `/transactions/{id}/single` | Remove só esta parcela                              |
 | POST   | `/transactions/transfer`    | Cria transferência entre contas                     |
+
+### Sugestões de Categoria (Hints)
+
+| Método | Rota                      | Descrição                                       |
+| ------ | ------------------------- | ----------------------------------------------- |
+| GET    | `/hints/?description=...` | Retorna a categoria sugerida para uma descrição |
+| POST   | `/hints/`                 | Salva/atualiza o par descrição → categoria      |
 
 ### Categorias
 
@@ -176,3 +190,24 @@ Saldo de conta calculado dinamicamente em `services/balance.py` considerando ape
 ```bash
 pytest
 ```
+
+68 testes organizados em 4 módulos:
+
+| Arquivo                | Cobertura                                                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `test_auth.py`         | Registro, login, cookie httpOnly, perfil, troca de senha                                                        |
+| `test_accounts.py`     | CRUD de contas, isolamento entre usuários, cálculo de saldo (`is_paid`), exclusão com/sem transações vinculadas |
+| `test_transactions.py` | CRUD, parcelamento (cálculo de valores e datas), regras de conta de crédito, transferências, filtros            |
+| `test_analytics.py`    | Resumo, evolução mensal, por categoria, compromissos futuros, comparação de meses, despesas recorrentes         |
+
+Os testes rodam contra um banco PostgreSQL dedicado (`valore_test`), criado e limpo automaticamente a cada execução via fixtures no `conftest.py`, garantindo isolamento entre casos de teste.
+
+**Resultado atual: 68/68 (100%) de aprovação.**
+Only, perfil, troca de senha |
+| `test_accounts.py` | CRUD de contas, isolamento entre usuários, cálculo de saldo (`is_paid`), exclusão com/sem transações vinculadas |
+| `test_transactions.py` | CRUD, parcelamento (cálculo de valores e datas), regras de conta de crédito, transferências, filtros |
+| `test_analytics.py` | Resumo, evolução mensal, por categoria, compromissos futuros, comparação de meses, despesas recorrentes |
+
+Os testes rodam contra um banco PostgreSQL dedicado (`valore_test`), criado e limpo automaticamente a cada execução via fixtures no `conftest.py`, garantindo isolamento entre casos de teste.
+
+**Resultado atual: 68/68 (100%) de aprovação.**
