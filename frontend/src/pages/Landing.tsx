@@ -1,4 +1,5 @@
 import { ValoreLogo, ValoreMark } from "@/components/brand/Logo";
+import { AnimatedValoreBackground } from "@/components/landing/AnimatedValoreBackground";
 import { motion, type Variants } from "framer-motion";
 import {
   ArrowDown,
@@ -66,9 +67,11 @@ export default function Landing() {
 
   return (
     <div
-      className="min-h-screen text-[#F2F4F0] overflow-x-hidden"
+      className="relative min-h-screen text-[#F2F4F0] overflow-x-hidden"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
+      <AnimatedValoreBackground />
+
       {/* ─── NAVBAR — bg: #090B0A ──────────────────────────── */}
       <div
         style={{
@@ -91,7 +94,7 @@ export default function Landing() {
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-between px-6 md:px-10 py-5 max-w-6xl mx-auto"
+          className="relative z-20 flex items-center justify-between px-6 md:px-10 py-5 max-w-6xl mx-auto"
         >
           <ValoreLogo size={30} className="text-[#7DB99A]" />
           <div className="flex items-center gap-2">
@@ -113,6 +116,7 @@ export default function Landing() {
 
       {/* ─── HERO — bg: #090B0A ────────────────────────────── */}
       <section
+        className="relative z-10"
         style={{
           background:
             "radial-gradient(70% 50% at 10% 0%, rgba(76,138,106,0.14) 0%, transparent 65%), radial-gradient(50% 40% at 90% 10%, rgba(199,163,90,0.09) 0%, transparent 65%), #090B0A",
