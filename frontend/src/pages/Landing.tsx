@@ -669,9 +669,9 @@ export default function Landing() {
             </nav>
 
             <p className="text-xs text-white/20 text-center md:text-right leading-relaxed">
-              © 2026 Valore · TCC — CSTSI / IFSul
+              © 2026 Valore · CSTSI / IFSul
               <br />
-              Orientador: Renato Marques Dilli
+              Desenvolvido por Vicenzo Escobar de Azambuja
             </p>
           </div>
         </div>
