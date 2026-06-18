@@ -661,7 +661,7 @@ export default function Landing() {
                 Criar conta
               </button>
               <a
-                href="mailto:vicenzo@valore.app"
+                href="mailto:vicenzo.esc@gmail.com"
                 className="hover:text-white/70 transition-colors"
               >
                 Contato
