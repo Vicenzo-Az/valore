@@ -61,7 +61,17 @@ export default function Landing() {
       style={{ fontFamily: "Inter, sans-serif" }}
     >
       {/* ─── NAVBAR — bg: #090B0A ──────────────────────────── */}
-      <div style={{ background: "#090B0A" }}>
+      <div
+        style={{
+          background: "rgba(9,11,10,0.85)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
+        }}
+      >
         <motion.nav
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -615,28 +625,126 @@ export default function Landing() {
           className="max-w-3xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center"
         >
           <div
-            className="rounded-3xl border border-[#4C8A6A]/18 p-12 md:p-16"
+            className="rounded-3xl border border-[#4C8A6A]/18 p-10 md:p-14 overflow-hidden relative"
             style={{
               background:
                 "radial-gradient(ellipse 80% 100% at 50% 110%, rgba(76,138,106,0.07) 0%, transparent 70%), rgba(255,255,255,0.01)",
             }}
           >
-            <h2 className="font-display text-2xl md:text-3xl font-bold mb-3 tracking-tight">
-              Comece a organizar hoje
-            </h2>
-            <p className="text-white/40 mb-8 text-sm">
-              Crie sua conta gratuitamente. Sem cartão, sem compromisso.
-            </p>
-            <button
-              onClick={() => navigate("/register")}
-              className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-all duration-200"
-            >
-              Criar conta grátis
-              <ArrowRight
-                size={16}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </button>
+            {/* Mini cards animados no fundo */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[
+                {
+                  label: "Patrimônio",
+                  value: "R$ 24.830",
+                  color: "#8FC4A6",
+                  x: "-8%",
+                  y: "15%",
+                  rotate: "-8deg",
+                  delay: 0,
+                },
+                {
+                  label: "Parcela 3/12",
+                  value: "R$ 500",
+                  color: "#D9B36A",
+                  x: "78%",
+                  y: "8%",
+                  rotate: "7deg",
+                  delay: 0.15,
+                },
+                {
+                  label: "Despesas",
+                  value: "R$ 1.240",
+                  color: "#D98B7E",
+                  x: "82%",
+                  y: "58%",
+                  rotate: "-5deg",
+                  delay: 0.3,
+                },
+                {
+                  label: "Receitas",
+                  value: "R$ 5.000",
+                  color: "#8FC4A6",
+                  x: "-6%",
+                  y: "62%",
+                  rotate: "6deg",
+                  delay: 0.2,
+                },
+              ].map((card, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.6,
+                    delay: card.delay,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className="absolute rounded-xl border border-white/[0.08] bg-[#0F1E18] px-4 py-3 shadow-lg"
+                  style={{
+                    left: card.x,
+                    top: card.y,
+                    transform: `rotate(${card.rotate})`,
+                  }}
+                >
+                  <p className="text-[10px] text-white/30 mb-1">{card.label}</p>
+                  <p
+                    className="text-sm font-display font-bold"
+                    style={{ color: card.color }}
+                  >
+                    {card.value}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Conteúdo central */}
+            <div className="relative z-10">
+              {/* Logo animado */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="flex items-center justify-center mb-6"
+              >
+                <div className="relative">
+                  <motion.div
+                    animate={{ scale: [1, 1.12, 1] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 3,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute inset-0 rounded-full bg-[#4C8A6A]/15"
+                    style={{ margin: "-10px" }}
+                  />
+                  <ValoreMark
+                    size={44}
+                    className="text-[#7DB99A] relative z-10"
+                  />
+                </div>
+              </motion.div>
+
+              <h2 className="font-display text-2xl md:text-3xl font-bold mb-3 tracking-tight">
+                Comece a organizar hoje
+              </h2>
+              <p className="text-white/40 mb-8 text-sm max-w-xs mx-auto leading-relaxed">
+                Crie sua conta em segundos. Gratuito, sem cartão, sem
+                compromisso.
+              </p>
+              <button
+                onClick={() => navigate("/register")}
+                className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-all duration-200"
+              >
+                Criar conta grátis
+                <ArrowRight
+                  size={16}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              </button>
+            </div>
           </div>
         </motion.div>
       </section>
