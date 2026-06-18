@@ -11,6 +11,7 @@ import {
   Shield,
   Wallet,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const fadeUp: Variants = {
@@ -55,6 +56,14 @@ const honestPoints = [
 export default function Landing() {
   const navigate = useNavigate();
 
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div
       className="min-h-screen text-[#F2F4F0] overflow-x-hidden"
@@ -63,13 +72,19 @@ export default function Landing() {
       {/* ─── NAVBAR — bg: #090B0A ──────────────────────────── */}
       <div
         style={{
-          background: "rgba(9,11,10,0.85)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
-          position: "sticky",
+          background: scrolled ? "rgba(9,11,10,0.82)" : "rgba(9,11,10,0.25)",
+          backdropFilter: scrolled ? "blur(16px)" : "blur(4px)",
+          WebkitBackdropFilter: scrolled ? "blur(16px)" : "blur(4px)",
+          borderBottom: scrolled
+            ? "1px solid rgba(255,255,255,0.08)"
+            : "1px solid transparent",
+          position: "fixed",
           top: 0,
-          zIndex: 50,
+          left: 0,
+          right: 0,
+          zIndex: 999,
+          transition: "all 250ms ease",
+          boxShadow: scrolled ? "0 12px 40px rgba(0,0,0,0.28)" : "none",
         }}
       >
         <motion.nav
@@ -103,7 +118,7 @@ export default function Landing() {
             "radial-gradient(70% 50% at 10% 0%, rgba(76,138,106,0.14) 0%, transparent 65%), radial-gradient(50% 40% at 90% 10%, rgba(199,163,90,0.09) 0%, transparent 65%), #090B0A",
         }}
       >
-        <div className="max-w-5xl mx-auto px-6 md:px-10 pt-16 md:pt-24 pb-20 md:pb-28">
+        <div className="max-w-5xl mx-auto px-6 md:px-10 pt-28 md:pt-36 pb-20 md:pb-28">
           <motion.h1
             custom={0}
             variants={fadeUp}
@@ -123,10 +138,11 @@ export default function Landing() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="text-base md:text-lg text-white/50 max-w-md mb-9 leading-relaxed"
+            className="text-base md:text-lg text-white/50 max-w-xl mb-9 leading-relaxed"
           >
-            Contas, parcelas e análises em um só lugar — pensado para quem quer
-            entender o próprio dinheiro, não gerenciar uma planilha.
+            Contas, cartão, patrimônio e parcelas em um só lugar. Descubra para
+            onde seu dinheiro está indo sem depender de planilhas ou integrações
+            bancárias invasivas.
           </motion.p>
 
           <motion.div
@@ -152,6 +168,15 @@ export default function Landing() {
             >
               Já tenho conta
             </button>
+            <div className="flex flex-wrap gap-3 mt-6">
+              {["Sem anúncios", "Sem venda de dados", "Sem sync bancário"].map(
+                (item) => (
+                  <div className="px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.02] text-xs text-white/45">
+                    {item}
+                  </div>
+                ),
+              )}
+            </div>
           </motion.div>
 
           <motion.div
@@ -296,30 +321,6 @@ export default function Landing() {
               </div>
             </div>
           </div>
-        </motion.div>
-      </section>
-
-      {/* ─── DECLARAÇÃO EDITORIAL — bg: #090B0A ───────────── */}
-      <section style={{ background: "#090B0A" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7 }}
-          className="max-w-3xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center"
-        >
-          <div className="flex items-center justify-center gap-4 mb-7">
-            <span className="w-8 h-px bg-[#4C8A6A]/30" />
-            <ValoreMark size={20} className="text-[#4C8A6A]/50" />
-            <span className="w-8 h-px bg-[#4C8A6A]/30" />
-          </div>
-          <p className="font-display text-2xl md:text-4xl font-semibold leading-snug tracking-tight text-white/90">
-            Clareza é saber onde você está,
-            <br />
-            <span className="text-[#8FC4A6]">
-              antes de decidir para onde vai.
-            </span>
-          </p>
         </motion.div>
       </section>
 
@@ -632,72 +633,67 @@ export default function Landing() {
             }}
           >
             {/* Mini cards animados no fundo */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 40,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="absolute inset-0 pointer-events-none"
+            >
               {[
                 {
                   label: "Patrimônio",
                   value: "R$ 24.830",
-                  color: "#8FC4A6",
-                  x: "-8%",
-                  y: "15%",
-                  rotate: "-8deg",
-                  delay: 0,
+                  top: "6%",
+                  left: "50%",
                 },
                 {
-                  label: "Parcela 3/12",
+                  label: "Parcela",
                   value: "R$ 500",
-                  color: "#D9B36A",
-                  x: "78%",
-                  y: "8%",
-                  rotate: "7deg",
-                  delay: 0.15,
-                },
-                {
-                  label: "Despesas",
-                  value: "R$ 1.240",
-                  color: "#D98B7E",
-                  x: "82%",
-                  y: "58%",
-                  rotate: "-5deg",
-                  delay: 0.3,
+                  top: "68%",
+                  left: "20%",
                 },
                 {
                   label: "Receitas",
                   value: "R$ 5.000",
-                  color: "#8FC4A6",
-                  x: "-6%",
-                  y: "62%",
-                  rotate: "6deg",
-                  delay: 0.2,
+                  top: "68%",
+                  left: "80%",
                 },
               ].map((card, i) => (
-                <motion.div
+                <div
                   key={i}
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{
-                    duration: 0.6,
-                    delay: card.delay,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="absolute rounded-xl border border-white/[0.08] bg-[#0F1E18] px-4 py-3 shadow-lg"
+                  className="absolute rounded-xl border border-white/[0.08] bg-[#0F1E18]/90 px-4 py-3 shadow-xl backdrop-blur-sm"
                   style={{
-                    left: card.x,
-                    top: card.y,
-                    transform: `rotate(${card.rotate})`,
+                    top: card.top,
+                    left: card.left,
+                    transform: "translate(-50%, -50%)",
                   }}
                 >
-                  <p className="text-[10px] text-white/30 mb-1">{card.label}</p>
-                  <p
-                    className="text-sm font-display font-bold"
-                    style={{ color: card.color }}
-                  >
+                  <p className="text-[10px] text-white/30">{card.label}</p>
+                  <p className="text-sm font-bold text-[#8FC4A6]">
                     {card.value}
                   </p>
-                </motion.div>
+                </div>
               ))}
-            </div>
+            </motion.div>
+
+            <motion.div
+              animate={{
+                scale: [1, 1.08, 1],
+                opacity: [0.2, 0.45, 0.2],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+              }}
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(circle at center, rgba(76,138,106,0.16), transparent 60%)",
+              }}
+            />
 
             {/* Conteúdo central */}
             <div className="relative z-10">
@@ -728,15 +724,14 @@ export default function Landing() {
               </motion.div>
 
               <h2 className="font-display text-2xl md:text-3xl font-bold mb-3 tracking-tight">
-                Comece a organizar hoje
+                Veja seu dinheiro com clareza
               </h2>
               <p className="text-white/40 mb-8 text-sm max-w-xs mx-auto leading-relaxed">
-                Crie sua conta em segundos. Gratuito, sem cartão, sem
-                compromisso.
+                Sem planilhas. Sem anúncios. Sem vender seus dados.
               </p>
               <button
                 onClick={() => navigate("/register")}
-                className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-all duration-200"
+                className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Criar conta grátis
                 <ArrowRight
