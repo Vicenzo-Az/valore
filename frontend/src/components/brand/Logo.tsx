@@ -4,7 +4,7 @@ interface LogoProps {
 }
 
 /**
- * Marca Valore — chevrons aninhados formando um "V",
+ * Marca Valore — dois chevrons aninhados formando um "V",
  * representando camadas de organização financeira.
  */
 export function ValoreMark({ size = 32, className = "" }: LogoProps) {
@@ -18,17 +18,19 @@ export function ValoreMark({ size = 32, className = "" }: LogoProps) {
       className={className}
     >
       <path
-        d="M14 22 L37 22 C39.2 22 41.2 23.2 42.3 25.1 L50 38 L57.7 25.1 C58.8 23.2 60.8 22 63 22 L86 22 L57.5 71.5 C56.4 73.4 54.3 74.6 52 74.6 L48 74.6 C45.7 74.6 43.6 73.4 42.5 71.5 L14 22 Z"
+        d="M10 20 L32 20 C34.8 20 37.4 21.5 38.8 24 L50 44 L61.2 24 C62.6 21.5 65.2 20 68 20 L90 20 L57.5 76.5 C56.2 78.7 53.9 80 51.4 80 L48.6 80 C46.1 80 43.8 78.7 42.5 76.5 L10 20 Z"
         stroke="currentColor"
-        strokeWidth="4.5"
+        strokeWidth="6"
         strokeLinejoin="round"
+        strokeLinecap="round"
         fill="none"
       />
       <path
-        d="M25.5 30.5 L37 30.5 C38.3 30.5 39.5 31.2 40.1 32.3 L50 49.5 L59.9 32.3 C60.5 31.2 61.7 30.5 63 30.5 L74.5 30.5 L53.8 63.8 C53.1 65 51.8 65.7 50.4 65.7 L49.6 65.7 C48.2 65.7 46.9 65 46.2 63.8 L25.5 30.5 Z"
+        d="M30 38 L40 38 C41.4 38 42.7 38.8 43.4 40 L50 51.5 L56.6 40 C57.3 38.8 58.6 38 60 38 L70 38 L54 66 C53.3 67.2 52 68 50.6 68 L49.4 68 C48 68 46.7 67.2 46 66 L30 38 Z"
         stroke="currentColor"
-        strokeWidth="4.5"
+        strokeWidth="6"
         strokeLinejoin="round"
+        strokeLinecap="round"
         fill="none"
       />
     </svg>
@@ -37,11 +39,11 @@ export function ValoreMark({ size = 32, className = "" }: LogoProps) {
 
 export function ValoreLogo({ size = 28, className = "" }: LogoProps) {
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      <ValoreMark size={size} />
+    <div className={`flex items-center gap-2.5 leading-none ${className}`}>
+      <ValoreMark size={size} className="shrink-0" />
       <span
-        className="font-display font-bold tracking-tight lowercase"
-        style={{ fontSize: size * 0.82 }}
+        className="font-display font-bold tracking-tight lowercase leading-none flex items-center"
+        style={{ fontSize: size * 0.82, height: size }}
       >
         valore
       </span>

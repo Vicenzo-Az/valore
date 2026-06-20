@@ -213,11 +213,6 @@ export default function Landing() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="relative max-w-5xl mx-auto px-6 md:px-10 py-20 md:py-28"
         >
-          {/* Marca d'água do V */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-            <ValoreMark size={520} className="text-white/[0.018]" />
-          </div>
-
           {/* Label de seção */}
           <div className="flex items-center gap-3 mb-10">
             <span className="w-5 h-px bg-[#4C8A6A]/50" />
@@ -229,10 +224,7 @@ export default function Landing() {
           {/* Grid assimétrico */}
           <div className="relative grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {/* Card grande — Patrimônio */}
-            <div
-              className="col-span-2 md:col-span-1 md:row-span-2 rounded-2xl border border-white/[0.08] bg-[#0F1E18] p-6 flex flex-col justify-between min-h-[160px] md:min-h-[300px] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.6)]"
-              style={{ transform: "translateY(-10px)" }}
-            >
+            <div className="col-span-2 md:col-span-1 md:row-span-2 rounded-2xl border border-white/[0.08] bg-[#0F1E18] p-6 flex flex-col justify-between min-h-[160px] md:min-h-[300px] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.6)]">
               <div>
                 <div className="flex items-center gap-2 mb-4 text-white/35">
                   <Wallet size={14} strokeWidth={1.5} />
@@ -261,10 +253,7 @@ export default function Landing() {
             </div>
 
             {/* Card — Compra parcelada */}
-            <div
-              className="rounded-2xl border border-white/[0.08] bg-[#0F1E18] p-5 shadow-[0_24px_64px_-16px_rgba(0,0,0,0.6)]"
-              style={{ transform: "translateY(14px)" }}
-            >
+            <div className="rounded-2xl border border-white/[0.08] bg-[#0F1E18] p-5 shadow-[0_24px_64px_-16px_rgba(0,0,0,0.6)]">
               <div className="flex items-center gap-2 mb-3 text-white/35">
                 <CreditCard size={13} strokeWidth={1.5} />
                 <span className="text-xs">Compra parcelada</span>
@@ -285,10 +274,7 @@ export default function Landing() {
             </div>
 
             {/* Card — Compromissos futuros */}
-            <div
-              className="rounded-2xl border border-white/[0.08] bg-[#0F1E18] p-5 shadow-[0_24px_64px_-16px_rgba(0,0,0,0.6)]"
-              style={{ transform: "translateY(-6px)" }}
-            >
+            <div className="rounded-2xl border border-white/[0.08] bg-[#0F1E18] p-5 shadow-[0_24px_64px_-16px_rgba(0,0,0,0.6)]">
               <div className="flex items-center gap-2 mb-3 text-white/35">
                 <CalendarClock size={13} strokeWidth={1.5} />
                 <span className="text-xs">Compromissos futuros</span>
@@ -302,10 +288,7 @@ export default function Landing() {
             </div>
 
             {/* Card — Análise mensal */}
-            <div
-              className="col-span-2 rounded-2xl border border-[#C7A35A]/12 bg-[#0F1E18] p-5 shadow-[0_24px_64px_-16px_rgba(0,0,0,0.6)]"
-              style={{ transform: "translateY(6px)" }}
-            >
+            <div className="col-span-2 rounded-2xl border border-[#C7A35A]/12 bg-[#0F1E18] p-5 shadow-[0_24px_64px_-16px_rgba(0,0,0,0.6)]">
               <div className="flex items-center gap-2 mb-3 text-white/35">
                 <BarChart3 size={13} strokeWidth={1.5} />
                 <span className="text-xs">Evolução mensal</span>
@@ -418,8 +401,13 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─── PARCELAMENTOS — bg: #0D1511 ──────────────────── */}
-      <section style={{ background: "#0D1511" }}>
+      {/* ─── PARCELAMENTOS — bg: gradiente dourado-musgo ──── */}
+      <section
+        style={{
+          background:
+            "radial-gradient(60% 50% at 85% 20%, rgba(199,163,90,0.08) 0%, transparent 70%), radial-gradient(50% 40% at 10% 90%, rgba(76,138,106,0.06) 0%, transparent 70%), #0D1511",
+        }}
+      >
         <div className="max-w-4xl mx-auto px-6 md:px-10 py-20 md:py-28">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
             <div>
@@ -644,7 +632,7 @@ export default function Landing() {
                 "radial-gradient(ellipse 80% 100% at 50% 110%, rgba(76,138,106,0.07) 0%, transparent 70%), rgba(255,255,255,0.01)",
             }}
           >
-            {/* Mini cards animados no fundo */}
+            {/* Mini cards orbitando — sempre voltados para cima */}
             <motion.div
               animate={{ rotate: 360 }}
               transition={{
@@ -663,15 +651,26 @@ export default function Landing() {
                   key={i}
                   className="absolute top-1/2 left-1/2"
                   style={{
-                    transform: `translate(-50%, -50%) rotate(${card.angle}deg) translateX(170px) rotate(-${card.angle}deg)`,
+                    transform: `translate(-50%, -50%) rotate(${card.angle}deg) translateX(170px)`,
                   }}
                 >
-                  <div className="rounded-xl border border-white/[0.08] bg-[#0F1E18]/90 px-4 py-3 shadow-xl backdrop-blur-sm">
-                    <p className="text-[10px] text-white/30">{card.label}</p>
-                    <p className="text-sm font-bold text-[#8FC4A6]">
-                      {card.value}
-                    </p>
-                  </div>
+                  {/* Contra-rotação: anula o giro do pai + o ângulo da órbita, mantendo o card sempre na vertical */}
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{
+                      duration: 40,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    style={{ transform: `rotate(${-card.angle}deg)` }}
+                  >
+                    <div className="rounded-xl border border-white/[0.08] bg-[#0F1E18]/90 px-4 py-3 shadow-xl backdrop-blur-sm">
+                      <p className="text-[10px] text-white/30">{card.label}</p>
+                      <p className="text-sm font-bold text-[#8FC4A6]">
+                        {card.value}
+                      </p>
+                    </div>
+                  </motion.div>
                 </div>
               ))}
             </motion.div>
