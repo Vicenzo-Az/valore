@@ -93,7 +93,7 @@ export default function Landing() {
           transition={{ duration: 0.5 }}
           className="flex items-center justify-between px-6 md:px-10 py-5 max-w-6xl mx-auto"
         >
-          <ValoreLogo size={30} className="text-[#7DB99A]" />
+          <ValoreLogo size={44} className="text-[#7DB99A]" />
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate("/login")}
@@ -401,11 +401,11 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─── PARCELAMENTOS — bg: gradiente dourado-musgo ──── */}
+      {/* ─── PARCELAMENTOS — transição suave com vizinhas ──── */}
       <section
         style={{
           background:
-            "radial-gradient(60% 50% at 85% 20%, rgba(199,163,90,0.08) 0%, transparent 70%), radial-gradient(50% 40% at 10% 90%, rgba(76,138,106,0.06) 0%, transparent 70%), #0D1511",
+            "radial-gradient(55% 60% at 88% 15%, rgba(199,163,90,0.07) 0%, transparent 70%), linear-gradient(180deg, #0B1512 0%, #11201A 14%, #11201A 86%, #0B1512 100%)",
         }}
       >
         <div className="max-w-4xl mx-auto px-6 md:px-10 py-20 md:py-28">
@@ -632,48 +632,43 @@ export default function Landing() {
                 "radial-gradient(ellipse 80% 100% at 50% 110%, rgba(76,138,106,0.07) 0%, transparent 70%), rgba(255,255,255,0.01)",
             }}
           >
-            {/* Mini cards orbitando — sempre voltados para cima */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 40,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              className="absolute inset-0 pointer-events-none"
-            >
-              {[
-                { label: "Patrimônio", value: "R$ 24.830", angle: 0 },
-                { label: "Parcela", value: "R$ 500", angle: 120 },
-                { label: "Receitas", value: "R$ 5.000", angle: 240 },
-              ].map((card, i) => (
-                <div
+            {/* Mini cards orbitando — posição em círculo via x/y, nunca rotacionam */}
+            {[
+              { label: "Patrimônio", value: "R$ 24.830", angle: 0 },
+              { label: "Parcela", value: "R$ 500", angle: 120 },
+              { label: "Receitas", value: "R$ 5.000", angle: 240 },
+            ].map((card, i) => {
+              const radius = 170;
+              const steps = 48;
+              const xKeyframes = Array.from({ length: steps + 1 }, (_, s) => {
+                const rad = ((360 * s) / steps + card.angle) * (Math.PI / 180);
+                return radius * Math.cos(rad);
+              });
+              const yKeyframes = Array.from({ length: steps + 1 }, (_, s) => {
+                const rad = ((360 * s) / steps + card.angle) * (Math.PI / 180);
+                return radius * Math.sin(rad);
+              });
+              return (
+                <motion.div
                   key={i}
-                  className="absolute top-1/2 left-1/2"
-                  style={{
-                    transform: `translate(-50%, -50%) rotate(${card.angle}deg) translateX(170px)`,
+                  className="absolute top-1/2 left-1/2 pointer-events-none"
+                  style={{ marginLeft: -55, marginTop: -22 }}
+                  animate={{ x: xKeyframes, y: yKeyframes }}
+                  transition={{
+                    duration: 40,
+                    repeat: Infinity,
+                    ease: "linear",
                   }}
                 >
-                  {/* Contra-rotação: anula o giro do pai + o ângulo da órbita, mantendo o card sempre na vertical */}
-                  <motion.div
-                    animate={{ rotate: -360 }}
-                    transition={{
-                      duration: 40,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                    style={{ transform: `rotate(${-card.angle}deg)` }}
-                  >
-                    <div className="rounded-xl border border-white/[0.08] bg-[#0F1E18]/90 px-4 py-3 shadow-xl backdrop-blur-sm">
-                      <p className="text-[10px] text-white/30">{card.label}</p>
-                      <p className="text-sm font-bold text-[#8FC4A6]">
-                        {card.value}
-                      </p>
-                    </div>
-                  </motion.div>
-                </div>
-              ))}
-            </motion.div>
+                  <div className="rounded-xl border border-white/[0.08] bg-[#0F1E18]/90 px-4 py-3 shadow-xl backdrop-blur-sm w-[110px]">
+                    <p className="text-[10px] text-white/30">{card.label}</p>
+                    <p className="text-sm font-bold text-[#8FC4A6]">
+                      {card.value}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
 
             <motion.div
               animate={{
@@ -739,7 +734,7 @@ export default function Landing() {
       <footer style={{ background: "#090B0A" }}>
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-10 border-t border-white/[0.06]">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <ValoreLogo size={22} className="text-[#7DB99A]" />
+            <ValoreLogo size={32} className="text-[#7DB99A]" />
 
             <nav className="flex items-center gap-6 text-sm text-white/35">
               <button

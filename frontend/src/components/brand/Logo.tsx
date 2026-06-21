@@ -27,13 +27,13 @@ export function ValoreMark({ size = 32, className = "" }: LogoProps) {
 
 export function ValoreLogo({ size = 28, className = "" }: LogoProps) {
   return (
-    <div className={`flex items-center gap-2.5 leading-none ${className}`}>
+    <div className={`flex items-end gap-2 ${className}`}>
       <ValoreMark size={size} className="shrink-0" />
       <span
-        className="font-display font-bold tracking-tight lowercase leading-none flex items-center"
-        style={{ fontSize: size * 0.82, height: size }}
+        className="font-display font-bold tracking-tight leading-none"
+        style={{ fontSize: size * 0.62 }}
       >
-        valore
+        Valore
       </span>
     </div>
   );
