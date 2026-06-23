@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 
 type Variant = "highlight" | "income" | "expense" | "balance";
 
@@ -8,19 +7,29 @@ interface StatCardProps {
   variant?: Variant;
 }
 
-const variantStyles: Record<Variant, { bar: string; value: string }> = {
-  highlight: { bar: "bg-emerald-500/70 dark:bg-emerald-500/50", value: "" },
+const variantStyles: Record<
+  Variant,
+  { accent: string; value: string; glow: string }
+> = {
+  highlight: {
+    accent: "rgba(76,138,106,0.5)",
+    value: "text-[#8FC4A6]",
+    glow: "rgba(76,138,106,0.06)",
+  },
   income: {
-    bar: "bg-emerald-400/60 dark:bg-emerald-400/40",
-    value: "text-emerald-600 dark:text-emerald-400",
+    accent: "rgba(76,138,106,0.45)",
+    value: "text-[#8FC4A6]",
+    glow: "rgba(76,138,106,0.05)",
   },
   expense: {
-    bar: "bg-red-400/60 dark:bg-red-400/40",
-    value: "text-red-600 dark:text-red-400",
+    accent: "rgba(201,74,63,0.45)",
+    value: "text-[#D98B7E]",
+    glow: "rgba(201,74,63,0.04)",
   },
   balance: {
-    bar: "bg-blue-400/60 dark:bg-blue-400/40",
-    value: "text-blue-600 dark:text-blue-400",
+    accent: "rgba(199,163,90,0.45)",
+    value: "text-[#D9B36A]",
+    glow: "rgba(199,163,90,0.05)",
   },
 };
 
@@ -32,16 +41,33 @@ export function StatCard({
   const styles = variantStyles[variant];
 
   return (
-    <Card className="relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 dark:hover:shadow-black/50">
-      <div className={`absolute top-0 left-0 h-2.5 w-full ${styles.bar}`} />
-      <CardContent className="p-4 md:p-6">
-        <p className="text-xs text-muted-foreground">{title}</p>
-        <h2
-          className={`text-lg md:text-2xl font-bold mt-1 md:mt-2 ${styles.value}`}
+    <div
+      className="relative overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-0.5"
+      style={{
+        background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${styles.glow} 0%, transparent 70%), #121814`,
+        border: "1px solid rgba(255,255,255,0.06)",
+        boxShadow: "0 4px 24px -8px rgba(0,0,0,0.4)",
+      }}
+    >
+      {/* Acento superior — linha fina */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
+        style={{ background: styles.accent }}
+      />
+
+      <div className="p-4 md:p-5 pt-5 md:pt-6">
+        <p
+          className="text-xs font-medium mb-2 md:mb-3"
+          style={{ color: "rgba(255,255,255,0.35)" }}
+        >
+          {title}
+        </p>
+        <p
+          className={`text-lg md:text-2xl font-bold font-display ${styles.value}`}
         >
           {value}
-        </h2>
-      </CardContent>
-    </Card>
+        </p>
+      </div>
+    </div>
   );
 }

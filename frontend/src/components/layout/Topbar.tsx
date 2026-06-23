@@ -21,27 +21,34 @@ export function Topbar({ onMenuClick }: Props) {
   const firstName = user?.name?.split(" ")[0] ?? "Usuário";
 
   return (
-    <header className="h-16 border-b border-border flex items-center justify-between px-4 md:px-8 bg-background/80 backdrop-blur-sm shrink-0 sticky top-0 z-10">
+    <header
+      className="h-14 flex items-center justify-between px-4 md:px-6 shrink-0 sticky top-0 z-10"
+      style={{
+        background: "rgba(9,11,10,0.85)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
+      }}
+    >
       <div className="flex items-center gap-3">
-        {/* Botão hamburger — só mobile */}
+        {/* Hamburger — só mobile */}
         <button
           onClick={onMenuClick}
-          className="md:hidden p-2 rounded-md hover:bg-muted transition-colors"
+          className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors text-white/50 hover:text-white/80"
         >
-          <Menu size={20} />
+          <Menu size={18} />
         </button>
 
-        {/* Avatar + nome */}
+        {/* Avatar + saudação */}
         <button
           onClick={() => navigate("/profile")}
           className="flex items-center gap-3 group"
         >
           <div
-            className="
-            w-9 h-9 rounded-full overflow-hidden shrink-0
-            ring-2 ring-emerald-500/30 group-hover:ring-emerald-500/70
-            transition-all duration-200
-          "
+            className="w-8 h-8 rounded-full overflow-hidden shrink-0 ring-1 transition-all duration-200"
+            style={{
+              boxShadow: "0 0 0 1.5px rgba(76,138,106,0.35)",
+            }}
           >
             {user?.avatar_url ? (
               <img
@@ -50,16 +57,22 @@ export function Topbar({ onMenuClick }: Props) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-emerald-500/15 flex items-center justify-center">
-                <User size={16} className="text-emerald-500" />
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{ background: "rgba(76,138,106,0.15)" }}
+              >
+                <User size={14} style={{ color: "#7DB99A" }} />
               </div>
             )}
           </div>
           <div className="text-left hidden sm:block">
-            <p className="text-xs text-muted-foreground leading-none mb-1.5">
+            <p className="text-[10px] text-white/30 leading-none mb-1">
               Bem-vindo de volta
             </p>
-            <p className="text-base font-semibold leading-none group-hover:text-emerald-500 transition-colors">
+            <p
+              className="text-sm font-semibold leading-none transition-colors"
+              style={{ color: "rgba(255,255,255,0.85)" }}
+            >
               {firstName}
             </p>
           </div>
@@ -67,31 +80,31 @@ export function Topbar({ onMenuClick }: Props) {
       </div>
 
       {/* Ações */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <Button
           variant="ghost"
           size="icon"
-          className="text-muted-foreground hover:text-foreground"
+          className="h-8 w-8 text-white/35 hover:text-white/70 hover:bg-white/[0.05]"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           title={theme === "dark" ? "Modo claro" : "Modo escuro"}
         >
           {theme === "dark" ? (
-            <Sun className="h-4 w-4" />
+            <Sun className="h-3.5 w-3.5" />
           ) : (
-            <Moon className="h-4 w-4" />
+            <Moon className="h-3.5 w-3.5" />
           )}
         </Button>
 
-        <div className="w-px h-5 bg-border" />
+        <div className="w-px h-4 mx-1 bg-white/10" />
 
         <Button
           variant="ghost"
           size="icon"
-          className="text-muted-foreground hover:text-red-500 transition-colors"
+          className="h-8 w-8 text-white/35 hover:text-red-400 hover:bg-white/[0.05] transition-colors"
           onClick={handleLogout}
           title="Sair"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-3.5 w-3.5" />
         </Button>
       </div>
     </header>
