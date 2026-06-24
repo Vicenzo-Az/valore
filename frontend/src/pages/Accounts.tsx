@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -20,13 +18,13 @@ import { Loader2, Pencil, Plus, Trash2, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const COLOR_OPTIONS = [
-  "#10b981",
-  "#3b82f6",
+  "#4C8A6A",
+  "#C7A35A",
+  "#3B9B95",
+  "#C94A3F",
   "#8b5cf6",
-  "#f59e0b",
-  "#ef4444",
+  "#3b82f6",
   "#ec4899",
-  "#06b6d4",
   "#64748b",
 ];
 
@@ -42,67 +40,95 @@ function AccountCard({
   const isPositive = account.current_balance >= 0;
 
   return (
-    <Card className="relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <div
+      className="relative overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-0.5"
+      style={{
+        background: "#121814",
+        border: "1px solid rgba(255,255,255,0.06)",
+        boxShadow: "0 4px 24px -8px rgba(0,0,0,0.4)",
+      }}
+    >
+      {/* Acento colorido da conta */}
       <div
-        className="absolute top-0 left-0 h-1.5 w-full"
+        className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
         style={{ backgroundColor: account.color }}
       />
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
+
+      <div className="p-5">
+        <div className="flex items-start justify-between mb-5">
           <div className="flex items-center gap-3">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: `${account.color}20` }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ backgroundColor: `${account.color}18` }}
             >
-              <Wallet size={20} style={{ color: account.color }} />
+              <Wallet size={18} style={{ color: account.color }} />
             </div>
             <div>
-              <p className="font-semibold">{account.name}</p>
-              <div className="flex items-center gap-2">
+              <p
+                className="font-semibold text-sm"
+                style={{ color: "rgba(255,255,255,0.85)" }}
+              >
+                {account.name}
+              </p>
+              <div className="flex items-center gap-2 mt-0.5">
                 <span
-                  className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                  className="text-xs px-1.5 py-0.5 rounded-full font-medium"
+                  style={
                     account.is_credit
-                      ? "bg-blue-500/10 text-blue-500"
-                      : "bg-emerald-500/10 text-emerald-500"
-                  }`}
+                      ? {
+                          background: "rgba(199,163,90,0.12)",
+                          color: "#D9B36A",
+                        }
+                      : {
+                          background: "rgba(76,138,106,0.12)",
+                          color: "#7DB99A",
+                        }
+                  }
                 >
                   {account.is_credit ? "Crédito" : "Débito"}
                 </span>
-                <p className="text-xs text-muted-foreground">
+                <p
+                  className="text-xs"
+                  style={{ color: "rgba(255,255,255,0.3)" }}
+                >
                   Inicial: R$ {account.initial_balance.toFixed(2)}
                 </p>
               </div>
             </div>
           </div>
           <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
+            <button
+              className="h-8 w-8 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5"
+              style={{ color: "rgba(255,255,255,0.35)" }}
               onClick={() => onEdit(account)}
             >
-              <Pencil size={14} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-red-500 hover:text-red-600"
+              <Pencil size={13} />
+            </button>
+            <button
+              className="h-8 w-8 rounded-lg flex items-center justify-center transition-colors hover:bg-red-500/10"
+              style={{ color: "rgba(201,74,63,0.7)" }}
               onClick={() => onDelete(account.id)}
             >
-              <Trash2 size={14} />
-            </Button>
+              <Trash2 size={13} />
+            </button>
           </div>
         </div>
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Saldo atual</p>
           <p
-            className={`text-2xl font-bold ${isPositive ? "text-emerald-500" : "text-red-500"}`}
+            className="text-xs mb-1"
+            style={{ color: "rgba(255,255,255,0.3)" }}
+          >
+            Saldo atual
+          </p>
+          <p
+            className="text-2xl font-bold font-display"
+            style={{ color: isPositive ? "#8FC4A6" : "#D98B7E" }}
           >
             R$ {account.current_balance.toFixed(2)}
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -121,7 +147,7 @@ function AccountForm({
   const [initialBalance, setInitialBalance] = useState(
     initial?.initial_balance?.toString() ?? "0",
   );
-  const [color, setColor] = useState(initial?.color ?? "#10b981");
+  const [color, setColor] = useState(initial?.color ?? "#4C8A6A");
   const [isCredit, setIsCredit] = useState(initial?.is_credit ?? false);
   const [error, setError] = useState("");
 
@@ -143,20 +169,33 @@ function AccountForm({
     });
   }
 
+  const inputStyle = {
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    color: "rgba(255,255,255,0.85)",
+  };
+
   return (
     <div className="space-y-4 mt-4">
       <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block font-medium">
+        <label
+          className="text-xs mb-1.5 block font-medium"
+          style={{ color: "rgba(255,255,255,0.4)" }}
+        >
           Nome da conta
         </label>
         <Input
-          placeholder="Ex: Conta corrente, crédito, etc..."
+          placeholder="Ex: Conta corrente, crédito..."
           value={name}
           onChange={(e) => setName(e.target.value)}
+          style={inputStyle}
         />
       </div>
       <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block font-medium">
+        <label
+          className="text-xs mb-1.5 block font-medium"
+          style={{ color: "rgba(255,255,255,0.4)" }}
+        >
           Saldo inicial
         </label>
         <Input
@@ -164,13 +203,17 @@ function AccountForm({
           placeholder="0.00"
           value={initialBalance}
           onChange={(e) => setInitialBalance(e.target.value)}
+          style={inputStyle}
         />
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>
           Quanto você já tem nessa conta antes de registrar transações.
         </p>
       </div>
       <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block font-medium">
+        <label
+          className="text-xs mb-1.5 block font-medium"
+          style={{ color: "rgba(255,255,255,0.4)" }}
+        >
           Cor
         </label>
         <div className="flex gap-2 flex-wrap">
@@ -178,58 +221,89 @@ function AccountForm({
             <button
               key={c}
               onClick={() => setColor(c)}
-              className={`w-8 h-8 rounded-full border-2 transition-all ${
-                color === c
-                  ? "border-foreground scale-110"
-                  : "border-transparent"
-              }`}
+              className={`w-8 h-8 rounded-full transition-all ${color === c ? "scale-110 ring-2 ring-white/40" : ""}`}
               style={{ backgroundColor: c }}
             />
           ))}
         </div>
       </div>
       <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block font-medium">
+        <label
+          className="text-xs mb-1.5 block font-medium"
+          style={{ color: "rgba(255,255,255,0.4)" }}
+        >
           Tipo de conta
         </label>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setIsCredit(false)}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-all ${
+            className="flex-1 py-2 rounded-xl text-sm font-medium border transition-all"
+            style={
               !isCredit
-                ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                : "border-border text-muted-foreground hover:border-emerald-500/40"
-            }`}
+                ? {
+                    border: "1px solid rgba(76,138,106,0.5)",
+                    background: "rgba(76,138,106,0.1)",
+                    color: "#8FC4A6",
+                  }
+                : {
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "rgba(255,255,255,0.4)",
+                  }
+            }
           >
             Débito
           </button>
           <button
             type="button"
             onClick={() => setIsCredit(true)}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-all ${
+            className="flex-1 py-2 rounded-xl text-sm font-medium border transition-all"
+            style={
               isCredit
-                ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                : "border-border text-muted-foreground hover:border-blue-500/40"
-            }`}
+                ? {
+                    border: "1px solid rgba(199,163,90,0.5)",
+                    background: "rgba(199,163,90,0.1)",
+                    color: "#D9B36A",
+                  }
+                : {
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "rgba(255,255,255,0.4)",
+                  }
+            }
           >
             Crédito
           </button>
         </div>
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && (
+        <p className="text-sm" style={{ color: "#D98B7E" }}>
+          {error}
+        </p>
+      )}
       <div className="flex gap-2 pt-2">
-        <Button variant="outline" className="flex-1" onClick={onCancel}>
+        <button
+          className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
+          style={{
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.5)",
+          }}
+          onClick={onCancel}
+        >
           Cancelar
-        </Button>
-        <Button
-          className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white"
+        </button>
+        <button
+          className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
+          style={{
+            background: "#4C8A6A",
+            color: "#090B0A",
+            opacity: isLoading ? 0.6 : 1,
+          }}
           onClick={handleSave}
           disabled={isLoading}
         >
-          {isLoading && <Loader2 size={14} className="animate-spin mr-2" />}
+          {isLoading && <Loader2 size={14} className="animate-spin" />}
           Salvar
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -291,20 +365,15 @@ export default function Accounts() {
       setAccounts((prev) =>
         prev.filter((a) => a.id !== deleteAccountTarget.id),
       );
-      if (deleteTransactions) {
-        // Remove do contexto de transações todas vinculadas a essa conta
+      if (deleteTransactions)
         clearTransactionsByAccount(deleteAccountTarget.id);
-      }
       setDeleteAccountTarget(null);
       setDeleteAccountError("");
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })
         ?.response?.data?.detail;
-      if (detail?.includes("transação")) {
-        setDeleteAccountError(detail);
-      } else {
-        setDeleteAccountError("Erro ao deletar conta.");
-      }
+      if (detail?.includes("transação")) setDeleteAccountError(detail);
+      else setDeleteAccountError("Erro ao deletar conta.");
     }
   }
 
@@ -313,7 +382,10 @@ export default function Accounts() {
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
+        <Loader2
+          className="w-6 h-6 animate-spin"
+          style={{ color: "#7DB99A" }}
+        />
       </div>
     );
   }
@@ -322,11 +394,20 @@ export default function Accounts() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Contas</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1
+            className="text-2xl font-display font-semibold tracking-tight"
+            style={{ color: "rgba(255,255,255,0.9)" }}
+          >
+            Contas
+          </h1>
+          <p
+            className="text-sm mt-1"
+            style={{ color: "rgba(255,255,255,0.4)" }}
+          >
             Patrimônio total:{" "}
             <span
-              className={`font-semibold ${totalNetWorth >= 0 ? "text-emerald-500" : "text-red-500"}`}
+              className="font-semibold"
+              style={{ color: totalNetWorth >= 0 ? "#8FC4A6" : "#D98B7E" }}
             >
               R$ {totalNetWorth.toFixed(2)}
             </span>
@@ -334,10 +415,12 @@ export default function Accounts() {
         </div>
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2 bg-emerald-600 hover:bg-emerald-500 text-white">
-              <Plus size={16} />
-              Nova Conta
-            </Button>
+            <button
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: "#4C8A6A", color: "#090B0A" }}
+            >
+              <Plus size={16} /> Nova Conta
+            </button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -353,26 +436,43 @@ export default function Accounts() {
       </div>
 
       {accounts.length === 0 ? (
-        <Card className="p-12 text-center border-2 border-dashed">
+        <div
+          className="p-12 text-center rounded-2xl"
+          style={{
+            background: "#121814",
+            border: "1px dashed rgba(255,255,255,0.08)",
+          }}
+        >
           <div className="max-w-sm mx-auto space-y-4">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto">
-              <Wallet size={28} className="text-emerald-500" />
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
+              style={{ background: "rgba(76,138,106,0.1)" }}
+            >
+              <Wallet size={26} style={{ color: "#7DB99A" }} />
             </div>
             <div className="space-y-1">
-              <h3 className="font-semibold text-lg">Nenhuma conta criada</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3
+                className="font-semibold text-lg"
+                style={{ color: "rgba(255,255,255,0.8)" }}
+              >
+                Nenhuma conta criada
+              </h3>
+              <p
+                className="text-sm"
+                style={{ color: "rgba(255,255,255,0.35)" }}
+              >
                 Crie sua primeira conta para começar a organizar suas finanças.
               </p>
             </div>
-            <Button
-              className="gap-2 bg-emerald-600 hover:bg-emerald-500 text-white"
+            <button
               onClick={() => setAddOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold"
+              style={{ background: "#4C8A6A", color: "#090B0A" }}
             >
-              <Plus size={16} />
-              Criar primeira conta
-            </Button>
+              <Plus size={16} /> Criar primeira conta
+            </button>
           </div>
-        </Card>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {accounts.map((account) => (
@@ -390,6 +490,7 @@ export default function Accounts() {
         </div>
       )}
 
+      {/* Dialog editar */}
       <Dialog
         open={!!editingAccount}
         onOpenChange={(open) => !open && setEditingAccount(null)}
@@ -409,6 +510,7 @@ export default function Accounts() {
         </DialogContent>
       </Dialog>
 
+      {/* Dialog deletar */}
       <Dialog
         open={!!deleteAccountTarget}
         onOpenChange={(open) => {
@@ -423,61 +525,92 @@ export default function Accounts() {
             <DialogTitle>Deletar conta</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
               Tem certeza que deseja deletar a conta{" "}
-              <span className="font-semibold">{deleteAccountTarget?.name}</span>
+              <span
+                className="font-semibold"
+                style={{ color: "rgba(255,255,255,0.8)" }}
+              >
+                {deleteAccountTarget?.name}
+              </span>
               ?
             </p>
             {deleteAccountError && (
-              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 space-y-3">
-                <p className="text-sm text-amber-600 dark:text-amber-400">
+              <div
+                className="rounded-xl p-4 space-y-3"
+                style={{
+                  background: "rgba(199,163,90,0.06)",
+                  border: "1px solid rgba(199,163,90,0.2)",
+                }}
+              >
+                <p className="text-sm" style={{ color: "#D9B36A" }}>
                   {deleteAccountError}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p
+                  className="text-xs"
+                  style={{ color: "rgba(255,255,255,0.35)" }}
+                >
                   Escolha como deseja proceder:
                 </p>
                 <div className="flex flex-col gap-2">
-                  <Button
-                    variant="destructive"
+                  <button
+                    className="py-2.5 rounded-xl text-sm font-medium transition-all"
+                    style={{
+                      background: "rgba(201,74,63,0.15)",
+                      border: "1px solid rgba(201,74,63,0.3)",
+                      color: "#D98B7E",
+                    }}
                     onClick={() => handleDelete(false, true)}
                   >
                     Deletar conta e todas as transações vinculadas
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-amber-500/40 text-amber-600 hover:bg-amber-500/10"
+                  </button>
+                  <button
+                    className="py-2.5 rounded-xl text-sm font-medium transition-all"
+                    style={{
+                      background: "rgba(199,163,90,0.08)",
+                      border: "1px solid rgba(199,163,90,0.25)",
+                      color: "#D9B36A",
+                    }}
                     onClick={() => handleDelete(true, false)}
                   >
                     Deletar só a conta (transações perdem o vínculo)
-                  </Button>
-                  <Button
-                    variant="ghost"
+                  </button>
+                  <button
+                    className="py-2.5 rounded-xl text-sm transition-all"
+                    style={{ color: "rgba(255,255,255,0.4)" }}
                     onClick={() => {
                       setDeleteAccountTarget(null);
                       setDeleteAccountError("");
                     }}
                   >
                     Cancelar
-                  </Button>
+                  </button>
                 </div>
               </div>
             )}
             {!deleteAccountError && (
               <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  className="flex-1"
+                <button
+                  className="flex-1 py-2.5 rounded-xl text-sm transition-all"
+                  style={{
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "rgba(255,255,255,0.4)",
+                  }}
                   onClick={() => setDeleteAccountTarget(null)}
                 >
                   Cancelar
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="flex-1"
+                </button>
+                <button
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
+                  style={{
+                    background: "rgba(201,74,63,0.15)",
+                    border: "1px solid rgba(201,74,63,0.3)",
+                    color: "#D98B7E",
+                  }}
                   onClick={() => handleDelete(false)}
                 >
                   Deletar
-                </Button>
+                </button>
               </div>
             )}
           </div>
