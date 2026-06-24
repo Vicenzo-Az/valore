@@ -66,12 +66,15 @@ export function Topbar({ onMenuClick }: Props) {
             )}
           </div>
           <div className="text-left hidden sm:block">
-            <p className="text-[10px] text-white/30 leading-none mb-1">
+            <p
+              className="text-[11px] leading-none mb-1"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
               Bem-vindo de volta
             </p>
             <p
               className="text-sm font-semibold leading-none transition-colors"
-              style={{ color: "rgba(255,255,255,0.85)" }}
+              style={{ color: "rgba(255,255,255,0.9)" }}
             >
               {firstName}
             </p>

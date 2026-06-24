@@ -45,15 +45,10 @@ function AccountCard({
       style={{
         background: "#121814",
         border: "1px solid rgba(255,255,255,0.06)",
+        borderLeft: `3px solid ${account.color}`,
         boxShadow: "0 4px 24px -8px rgba(0,0,0,0.4)",
       }}
     >
-      {/* Acento colorido da conta */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
-        style={{ backgroundColor: account.color }}
-      />
-
       <div className="p-5">
         <div className="flex items-start justify-between mb-5">
           <div className="flex items-center gap-3">
