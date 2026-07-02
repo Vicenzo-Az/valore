@@ -12,10 +12,17 @@ class User(Base):
         String, unique=True, nullable=False, index=True)
     hashed_password: Mapped[str] = Column(String, nullable=False)
     name: Mapped[str] = Column(String, nullable=False)
-
-    transactions = relationship("Transaction", back_populates="user")
-    accounts = relationship("Account", back_populates="user")
-    categories = relationship("Category", back_populates="user")
-    description_hints = relationship("DescriptionHint", back_populates="user")
-
     avatar_url: Mapped[str | None] = Column(String, nullable=True)
+
+    transactions = relationship(
+        "Transaction", back_populates="user", cascade="all, delete-orphan"
+    )
+    accounts = relationship(
+        "Account", back_populates="user", cascade="all, delete-orphan"
+    )
+    categories = relationship(
+        "Category", back_populates="user", cascade="all, delete-orphan"
+    )
+    description_hints = relationship(
+        "DescriptionHint", back_populates="user", cascade="all, delete-orphan"
+    )

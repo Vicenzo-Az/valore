@@ -117,3 +117,20 @@ def update_me(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+@router.delete("/me", status_code=204)
+def delete_my_account(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    response: Response = None,
+):
+    """Deleta a conta do usuário e todos os dados vinculados em cascata."""
+    db.delete(current_user)
+    db.commit()
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        samesite="none",
+        secure=True,
+    )
