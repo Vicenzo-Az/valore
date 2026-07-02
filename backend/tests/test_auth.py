@@ -115,3 +115,19 @@ class TestUpdateProfile:
             "new_password": "novasenha123",
         })
         assert response.status_code == 400
+
+
+class TestDeleteAccount:
+    def test_delete_account_success(self, auth_client: TestClient):
+        response = auth_client.delete("/auth/me")
+        assert response.status_code == 204
+
+    def test_delete_account_unauthenticated(self, client: TestClient):
+        response = client.delete("/auth/me")
+        assert response.status_code == 401
+
+    def test_me_after_delete(self, auth_client: TestClient):
+        auth_client.delete("/auth/me")
+        auth_client.cookies.clear()
+        response = auth_client.get("/auth/me")
+        assert response.status_code == 401
