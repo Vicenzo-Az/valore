@@ -14,4 +14,4 @@ class PasswordResetToken(Base):
     expires_at: Mapped[datetime] = Column(DateTime, nullable=False)
     created_at: Mapped[datetime] = Column(DateTime, default=datetime.utcnow)
 
-    user = relationship("User")
+    user = relationship("User", back_populates="password_reset_tokens")

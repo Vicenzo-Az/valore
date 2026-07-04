@@ -26,3 +26,6 @@ class User(Base):
     description_hints = relationship(
         "DescriptionHint", back_populates="user", cascade="all, delete-orphan"
     )
+    password_reset_tokens = relationship(
+        "PasswordResetToken", back_populates="user", cascade="all, delete-orphan"
+    )
