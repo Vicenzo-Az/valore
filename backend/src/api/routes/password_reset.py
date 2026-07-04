@@ -1,6 +1,6 @@
 import hashlib
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 import resend
@@ -54,7 +54,7 @@ def forgot_password(
     # Gera token criptograficamente seguro
     raw_token = secrets.token_urlsafe(32)
     token_hash = _hash_token(raw_token)
-    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    expires_at = datetime.utcnow() + timedelta(hours=1)
 
     db.add(PasswordResetToken(
         id=str(uuid4()),
@@ -117,7 +117,7 @@ def reset_password(
     ).first()
 
     # Token inválido ou expirado — mesma mensagem para ambos os casos
-    if not token_record or token_record.expires_at < datetime.now(timezone.utc):
+    if not token_record or token_record.expires_at < datetime.utcnow():
         raise HTTPException(
             status_code=400,
             detail="Link inválido ou expirado. Solicite um novo link de recuperação."
