@@ -14,6 +14,7 @@ import src.models.transaction   # noqa: F401
 import src.models.category      # noqa: F401
 import src.models.account       # noqa: F401
 import src.models.description_hint  # noqa: F401
+import src.models.password_reset_token  # noqa: F401
 
 config = context.config
 
