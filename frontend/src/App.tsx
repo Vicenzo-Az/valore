@@ -5,10 +5,12 @@ import { AppLayout } from "./components/layout/AppLayout";
 import Accounts from "./pages/Accounts";
 import Analytics from "./pages/Analytics";
 import Dashboard from "./pages/Dashboard";
+import ForgotPassword from "./pages/ForgotPassword";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
 import Settings from "./pages/Settings";
 import Transactions from "./pages/Transactions";
 
@@ -17,7 +19,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <div className="w-6 h-6 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+        <div
+          className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin"
+          style={{ borderColor: "#4C8A6A", borderTopColor: "transparent" }}
+        />
       </div>
     );
   }
@@ -55,6 +60,7 @@ export default function App() {
 
   return (
     <Routes>
+      {/* Públicas */}
       <Route path="/landing" element={<Landing />} />
       <Route
         path="/login"
@@ -72,7 +78,17 @@ export default function App() {
           </PublicRoute>
         }
       />
+      <Route
+        path="/forgot-password"
+        element={
+          <PublicRoute>
+            <ForgotPassword />
+          </PublicRoute>
+        }
+      />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
+      {/* Protegidas */}
       <Route path="/" element={<AppRoute component={Dashboard} />} />
       <Route path="/accounts" element={<AppRoute component={Accounts} />} />
       <Route

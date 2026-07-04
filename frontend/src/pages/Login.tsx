@@ -102,6 +102,17 @@ export default function Login({ onLogin }: Props) {
             Entrar na conta
           </h1>
 
+          <div className="text-right mt-1">
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-xs transition-colors"
+              style={{ color: "rgba(255,255,255,0.35)" }}
+            >
+              Esqueci minha senha
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
