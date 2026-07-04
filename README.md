@@ -16,7 +16,7 @@ O sistema permite registrar receitas, despesas e transferências entre contas, c
 ## Estrutura
 
 ```text
-finance-tracker/
+valore/
 ├── backend/
 │   ├── src/
 │   ├── tests/
