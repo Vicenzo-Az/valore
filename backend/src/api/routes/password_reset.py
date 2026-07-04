@@ -12,7 +12,7 @@ from src.core.config import settings
 from src.core.database import get_db
 from src.models.password_reset_token import PasswordResetToken
 from src.models.user import User
-from src.core.security import get_password_hash
+from src.core.security import hash_password
 
 router = APIRouter(prefix="/auth", tags=["password-reset"])
 
@@ -125,7 +125,7 @@ def reset_password(
 
     # Atualiza a senha
     user = db.query(User).filter(User.id == token_record.user_id).first()
-    user.hashed_password = get_password_hash(input.new_password)
+    user.hashed_password = hash_password(input.new_password)
 
     # Deleta o token — uso único
     db.delete(token_record)
