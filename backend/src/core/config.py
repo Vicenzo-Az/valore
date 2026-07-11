@@ -6,8 +6,10 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
-    resend_api_key: str = ""
     frontend_url: str = "http://localhost:5173"
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
 
     @property
     def sqlalchemy_database_url(self) -> str:

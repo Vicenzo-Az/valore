@@ -1,22 +1,22 @@
 import hashlib
 import secrets
+import smtplib
 from datetime import datetime, timedelta
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from uuid import uuid4
 
-import resend
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
 from src.core.config import settings
 from src.core.database import get_db
+from src.core.security import hash_password
 from src.models.password_reset_token import PasswordResetToken
 from src.models.user import User
-from src.core.security import hash_password
 
 router = APIRouter(prefix="/auth", tags=["password-reset"])
-
-resend.api_key = settings.resend_api_key
 
 GENERIC_RESPONSE = {
     "message": "Se o e-mail estiver cadastrado, você receberá um link de recuperação em breve."
@@ -34,6 +34,40 @@ class ResetPasswordInput(BaseModel):
 
 def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _send_reset_email(to_email: str, reset_link: str) -> None:
+    html = f"""
+    <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+      <h2 style="color: #2D6A4F; margin-bottom: 8px;">Recuperação de senha</h2>
+      <p style="color: #4A5750; margin-bottom: 24px;">
+        Recebemos uma solicitação para redefinir a senha da conta associada a este e-mail.
+        Clique no botão abaixo para criar uma nova senha.
+      </p>
+      <a href="{reset_link}"
+        style="display: inline-block; background: #4C8A6A; color: white;
+               padding: 12px 24px; border-radius: 10px; text-decoration: none;
+               font-weight: 600; margin-bottom: 24px;">
+        Redefinir senha
+      </a>
+      <p style="color: #8A928B; font-size: 13px;">
+        Este link expira em <strong>1 hora</strong>.<br/>
+        Se você não solicitou a recuperação, ignore este e-mail — sua senha permanece a mesma.
+      </p>
+      <hr style="border: none; border-top: 1px solid #E5E8E1; margin: 24px 0;" />
+      <p style="color: #8A928B; font-size: 12px;">Valore · CSTSI / IFSul</p>
+    </div>
+    """
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "Recuperação de senha — Valore"
+    msg["From"] = settings.smtp_from
+    msg["To"] = to_email
+    msg.attach(MIMEText(html, "html"))
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(settings.smtp_user, settings.smtp_password)
+        server.sendmail(settings.smtp_from, to_email, msg.as_string())
 
 
 @router.post("/forgot-password")
@@ -66,34 +100,8 @@ def forgot_password(
 
     reset_link = f"{settings.frontend_url}/reset-password?token={raw_token}"
 
-    # Envia e-mail via Resend
     try:
-        resend.Emails.send({
-            "from": "Valore <onboarding@resend.dev>",
-            "to": [user.email],
-            "subject": "Recuperação de senha — Valore",
-            "html": f"""
-            <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
-              <h2 style="color: #2D6A4F; margin-bottom: 8px;">Recuperação de senha</h2>
-              <p style="color: #4A5750; margin-bottom: 24px;">
-                Recebemos uma solicitação para redefinir a senha da conta associada a este e-mail.
-                Clique no botão abaixo para criar uma nova senha.
-              </p>
-              <a href="{reset_link}"
-                style="display: inline-block; background: #4C8A6A; color: white;
-                       padding: 12px 24px; border-radius: 10px; text-decoration: none;
-                       font-weight: 600; margin-bottom: 24px;">
-                Redefinir senha
-              </a>
-              <p style="color: #8A928B; font-size: 13px;">
-                Este link expira em <strong>1 hora</strong>.<br/>
-                Se você não solicitou a recuperação, ignore este e-mail — sua senha permanece a mesma.
-              </p>
-              <hr style="border: none; border-top: 1px solid #E5E8E1; margin: 24px 0;" />
-              <p style="color: #8A928B; font-size: 12px;">Valore · CSTSI / IFSul</p>
-            </div>
-            """,
-        })
+        _send_reset_email(user.email, reset_link)
     except Exception:
         # Não expõe erro de envio ao usuário
         pass
@@ -108,7 +116,9 @@ def reset_password(
 ):
     if len(input.new_password) < 8:
         raise HTTPException(
-            status_code=400, detail="A senha deve ter pelo menos 8 caracteres.")
+            status_code=400,
+            detail="A senha deve ter pelo menos 8 caracteres."
+        )
 
     token_hash = _hash_token(input.token)
 
