@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
     smtp_from: str = ""
+    valore_perf_password: str = ""
 
     @property
     def sqlalchemy_database_url(self) -> str:
